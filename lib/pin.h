@@ -26,3 +26,12 @@ class PwmOutPin {
   /** The frequency the hardware runs at, in hertz, which can differ slightly from the one asked for. */
   virtual uint32_t frequency() = 0;
 };
+
+/** A pin that measures the high pulses it receives, such as a channel of an RC receiver. */
+class PulseInPin {
+ public:
+  /** Returns false when the pin cannot run, such as when it has no interrupt. */
+  virtual bool begin() = 0;
+  /** The width, in microseconds, of the last high pulse if it ended within the last `maxAgeUs`; otherwise 0. */
+  virtual uint32_t read(uint32_t maxAgeUs) = 0;
+};
