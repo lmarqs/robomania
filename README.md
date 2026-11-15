@@ -97,6 +97,7 @@ The drivers in `lib/`:
 | `board_led.*` | The LED on the board the sketch is built for |
 | `line_reader.*` | Serial bytes split into lines |
 | `serial_io.*` | The serial port as lines: read without waiting, printed with `Print` |
+| `serial_settings.*`, `settings_store.*` | The settings a sketch lets the serial port change with `cfg`, kept in the EEPROM or, on an ESP32, in NVS |
 | `ledc_pin.*` | A PWM pin through the ESP32 LEDC peripheral, on a channel it allocates |
 | `h_bridge.*` | A motor through a full or half H-bridge |
 | `pulse_in_pin.*` | The width of the pulses a pin receives, such as an RC receiver channel's, timed by interrupt on an ESP32 |

@@ -18,6 +18,8 @@ const purpose: Record<string, string> = {
   'servo.h': 'A positional (180°) or continuous-rotation (360°) hobby servo on a PWM pin.',
   'line_reader.h': 'Bytes split into lines, the way SerialInput reads the serial port.',
   'serial_io.h': 'The serial port as lines: SerialInput reads them without waiting, SerialOutput prints them.',
+  'serial_settings.h': 'The settings a sketch lets the serial port change, and the cfg protocol the website changes them with.',
+  'settings_store.h': 'Where serial settings stay across restarts: the EEPROM, or NVS on an ESP32.',
   'camera.h': 'The camera of an AI Thinker ESP32-CAM.',
   'camera_pins.h': 'The pins the AI Thinker ESP32-CAM wires its camera to.',
   'web_server.h': 'An HTTP and WebSocket server on the ESP-IDF httpd.',
