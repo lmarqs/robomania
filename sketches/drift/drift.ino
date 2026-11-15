@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <Bluepad32.h>
 #include <Wire.h>
 #include <board_led.h>
 #include <esc.h>
@@ -9,25 +8,16 @@
 #include <steering_assist.h>
 
 #include "./config.h"
-
-// Its arguments are not evaluated while DRIFT_LOG is 0, so a disabled log costs nothing in the loop.
-#define LOG(...)                  \
-  do {                            \
-    if (DRIFT_LOG) {              \
-      Serial.printf(__VA_ARGS__); \
-    }                             \
-  } while (0)
+#include "./gamepad_input.h"
+#include "./receiver_input.h"
 
 const uint32_t BLINK_SLOT_MS = 1000;
 const uint32_t SHORT_BLINK_MS = 150;
 const uint32_t LONG_BLINK_MS = 600;
-const int32_t STICK_MAX = 512;
-const int32_t STICK_DEAD_ZONE = 40;
-const float GAIN_STEP = 0.1f;
 
-const uint8_t STATUS_GAMEPAD = 1 << 0;
+const uint8_t STATUS_CONTROLLER = 1 << 0;
 const uint8_t STATUS_IMU = 1 << 1;
-const uint8_t STATUS_ALL = STATUS_GAMEPAD | STATUS_IMU;
+const uint8_t STATUS_ALL = STATUS_CONTROLLER | STATUS_IMU;
 
 // The servo and the ESC share one 50 Hz LEDC timer; 16 bits make a step of 0.3 µs at that rate.
 static EspLedcOutPin steeringPin(STEERING_PIN, 50, 16);
@@ -39,38 +29,27 @@ static Mpu6050Imu imu(&Wire);
 static SteeringAssist assist(DRIFT_FULL_LOCK_DPS);
 static BoardLed led;
 
-static Controller* controller = nullptr;
+#if DRIFT_CONTROLLER == DRIFT_CONTROLLER_RECEIVER
+static ReceiverInput input(DRIFT_GAIN);
+#else
+static GamepadInput input(DRIFT_GAIN);
+#endif
+
 static bool imuFound = false;
 static uint8_t status = 0;
-static float gain = DRIFT_GAIN;
-static uint8_t lastDpad = 0;
 static uint32_t lastInputLogMs = 0;
 
 static void setStatus(uint8_t bit, bool works) {
   const uint8_t next = works ? status | bit : status & ~bit;
   if (next != status) {
-    LOG("status gamepad %s, imu %s\n", next & STATUS_GAMEPAD ? "connected" : "missing",
+    LOG("status controller %s, imu %s\n", next & STATUS_CONTROLLER ? "connected" : "missing",
         next & STATUS_IMU ? "working" : "failed");
   }
   status = next;
 }
 
-static void logGamepad(const char* event, Controller* c) {
-  const ControllerProperties properties = c->getProperties();
-  const uint8_t* a = properties.btaddr;
-  LOG("gamepad %d %s: %s, vid %04x pid %04x, %02X:%02X:%02X:%02X:%02X:%02X\n", c->index(), event,
-      c->getModelName().c_str(), properties.vendor_id, properties.product_id, a[0], a[1], a[2], a[3], a[4], a[5]);
-}
-
 /** RC expo: the same ends, a flatter middle, so small stick moves give finer control. */
 static float expo(float value, float amount) { return (1.0f - amount) * value + amount * value * value * value; }
-
-static float stickToUnit(int32_t value) {
-  if (abs(value) < STICK_DEAD_ZONE) {
-    return 0.0f;
-  }
-  return constrain((float)value / STICK_MAX, -1.0f, 1.0f);
-}
 
 static void writeSteering(float steer) {
   const float toward = steer >= 0.0f ? DRIFT_STEERING_RIGHT_US : DRIFT_STEERING_LEFT_US;
@@ -80,16 +59,6 @@ static void writeSteering(float steer) {
 static void stop() {
   esc.write(0.0f);
   writeSteering(0.0f);
-}
-
-static void adjustGain(uint8_t dpad) {
-  const uint8_t pressed = dpad & ~lastDpad;
-  lastDpad = dpad;
-  if (!(pressed & (DPAD_UP | DPAD_DOWN))) {
-    return;
-  }
-  gain = constrain(gain + (pressed & DPAD_UP ? GAIN_STEP : -GAIN_STEP), 0.0f, 1.0f);
-  LOG("gain %.1f\n", gain);
 }
 
 static float yawRateDps() {
@@ -107,7 +76,7 @@ static float yawRateDps() {
 
 /**
  * Whether the LED is lit at `nowMs`: steady while everything in STATUS_ALL works; otherwise a short blink each second
- * for the IMU, a long one for the gamepad, alternating when neither works.
+ * for the IMU, a long one for the controller, alternating when neither works.
  */
 static bool statusLed(uint8_t working, uint32_t nowMs) {
   const uint8_t missing = working ^ STATUS_ALL;
@@ -118,26 +87,31 @@ static bool statusLed(uint8_t working, uint32_t nowMs) {
   return nowMs % BLINK_SLOT_MS < (showImu ? SHORT_BLINK_MS : LONG_BLINK_MS);
 }
 
-static void drive(Controller* c) {
-  adjustGain(c->dpad());
-  // Bluepad32 reports a stick pushed down as positive, so up on the right stick drives forward.
-  const float throttle = expo(-stickToUnit(c->axisRY()), DRIFT_THROTTLE_EXPO) * DRIFT_THROTTLE_MAX;
+static void logInput(const DriveCommand& command, float yaw, float steer, float throttle) {
+  const uint32_t now = millis();
+  if (!DRIFT_LOG || DRIFT_LOG_INPUT_MS == 0 || now - lastInputLogMs < DRIFT_LOG_INPUT_MS) {
+    return;
+  }
+  lastInputLogMs = now;
+  LOG("input ");
+  input.logInput();
+  LOG(" | yaw %.1f steer %.2f esc %.2f gain %.2f\n", yaw, steer, throttle, command.gain);
+}
+
+static void drive(const DriveCommand& command) {
+  const float throttle = expo(command.throttle, DRIFT_THROTTLE_EXPO) * DRIFT_THROTTLE_MAX;
   const float yaw = yawRateDps();
-  const float steer = assist.steer(stickToUnit(c->axisX()), yaw, gain);
+  const float steer = assist.steer(command.steer, yaw, command.gain);
   esc.write(throttle);
   writeSteering(steer);
-
-  const uint32_t now = millis();
-  if (DRIFT_LOG && DRIFT_LOG_INPUT_MS > 0 && now - lastInputLogMs >= DRIFT_LOG_INPUT_MS) {
-    lastInputLogMs = now;
-    LOG("input lx %d ry %d dpad %02x buttons %04x battery %u | yaw %.1f steer %.2f esc %.2f\n", c->axisX(), c->axisRY(),
-        c->dpad(), c->buttons(), c->battery(), yaw, steer, throttle);
-  }
+  logInput(command, yaw, steer, throttle);
 }
 
 void setup() {
   Serial.begin(115200);
-  led.begin();
+  if (DRIFT_STATUS_LED) {
+    led.begin();
+  }
 
   if (!steering.begin() || !esc.begin()) {
     Serial.println("error a PWM pin has no LEDC channel");
@@ -157,36 +131,23 @@ void setup() {
     Serial.println("error MPU6050 not found, steering without assist");
   }
 
-  BP32.setup(
-      [](Controller* c) {
-        if (controller != nullptr) {
-          logGamepad("ignored, another drives", c);
-          return;
-        }
-        controller = c;
-        logGamepad("connected", c);
-        setStatus(STATUS_GAMEPAD, true);
-      },
-      [](Controller* c) {
-        if (controller != c) {
-          logGamepad("disconnected, was ignored", c);
-          return;
-        }
-        controller = nullptr;
-        logGamepad("disconnected", c);
-        setStatus(STATUS_GAMEPAD, false);
-        stop();
-      });
-  BP32.forgetBluetoothKeys();
-  BP32.enableVirtualDevice(false);
-  LOG("gain %.1f\n", gain);
+  input.begin();
+  LOG("gain %.1f\n", input.command().gain);
 }
 
 void loop() {
-  if (BP32.update() && controller && controller->isConnected() && controller->hasData()) {
-    drive(controller);
+  const bool fresh = input.update();
+  const bool connected = input.connected();
+  if (!connected && (status & STATUS_CONTROLLER)) {
+    stop();
   }
-  led.write(statusLed(status, millis()) ? HIGH : LOW);
+  setStatus(STATUS_CONTROLLER, connected);
+  if (fresh) {
+    drive(input.command());
+  }
+  if (DRIFT_STATUS_LED) {
+    led.write(statusLed(status, millis()) ? HIGH : LOW);
+  }
   // Sleeps a tick so core 1's idle task runs; Bluepad32 delivers gamepad data far less often than this.
   delay(1);
 }

@@ -6,6 +6,16 @@
 #include "local.h"
 #endif
 
+// What drives the car: a Bluetooth gamepad through Bluepad32, or a PWM RC receiver's channels.
+#define DRIFT_CONTROLLER_GAMEPAD 1
+#define DRIFT_CONTROLLER_RECEIVER 2
+#ifndef DRIFT_CONTROLLER
+#define DRIFT_CONTROLLER DRIFT_CONTROLLER_GAMEPAD
+#endif
+#if DRIFT_CONTROLLER != DRIFT_CONTROLLER_GAMEPAD && DRIFT_CONTROLLER != DRIFT_CONTROLLER_RECEIVER
+#error "DRIFT_CONTROLLER must be DRIFT_CONTROLLER_GAMEPAD or DRIFT_CONTROLLER_RECEIVER"
+#endif
+
 // ESP32 WROOM-32 GPIO numbers.
 #ifndef DRIFT_ESC_PIN
 #define DRIFT_ESC_PIN 21
@@ -36,7 +46,52 @@ const uint8_t I2C_SCL_PIN = DRIFT_I2C_SCL_PIN;
 #define DRIFT_STEERING_RIGHT_US 2000
 #endif
 
-// The largest throttle the right stick reaches, as a fraction of the ESC's range each way.
+// The receiver's channel pins; a gain pin of -1 leaves the gain at DRIFT_GAIN.
+#ifndef DRIFT_RECEIVER_THROTTLE_PIN
+#define DRIFT_RECEIVER_THROTTLE_PIN 5
+#endif
+#ifndef DRIFT_RECEIVER_STEERING_PIN
+#define DRIFT_RECEIVER_STEERING_PIN 17
+#endif
+#ifndef DRIFT_RECEIVER_GAIN_PIN
+#define DRIFT_RECEIVER_GAIN_PIN -1
+#endif
+
+// The receiver's pulses at one end, the centre and the other end of every channel, and the dead zone around the
+// centre. A transmitter's end points and trims set the channel to match.
+#ifndef DRIFT_RECEIVER_LOW_US
+#define DRIFT_RECEIVER_LOW_US 1000
+#endif
+#ifndef DRIFT_RECEIVER_CENTER_US
+#define DRIFT_RECEIVER_CENTER_US 1500
+#endif
+#ifndef DRIFT_RECEIVER_HIGH_US
+#define DRIFT_RECEIVER_HIGH_US 2000
+#endif
+#ifndef DRIFT_RECEIVER_DEAD_ZONE_US
+#define DRIFT_RECEIVER_DEAD_ZONE_US 20
+#endif
+
+// 1 flips a receiver channel, for a transmitter whose stick drives the car the wrong way.
+#ifndef DRIFT_RECEIVER_THROTTLE_REVERSED
+#define DRIFT_RECEIVER_THROTTLE_REVERSED 0
+#endif
+#ifndef DRIFT_RECEIVER_STEERING_REVERSED
+#define DRIFT_RECEIVER_STEERING_REVERSED 0
+#endif
+
+// How long, in milliseconds, the throttle or steering channel may go without a pulse before the car stops.
+#ifndef DRIFT_RECEIVER_TIMEOUT_MS
+#define DRIFT_RECEIVER_TIMEOUT_MS 100
+#endif
+
+// 1 shows the status on the board's LED, on GPIO2. It is off by default with a receiver, whose channels are often
+// wired to GPIO2, where the LED's output would fight the receiver's.
+#ifndef DRIFT_STATUS_LED
+#define DRIFT_STATUS_LED (DRIFT_CONTROLLER == DRIFT_CONTROLLER_GAMEPAD)
+#endif
+
+// The largest throttle the controller reaches, as a fraction of the ESC's range each way.
 #ifndef DRIFT_THROTTLE_MAX
 #define DRIFT_THROTTLE_MAX 0.5f
 #endif
@@ -65,14 +120,22 @@ static_assert(DRIFT_THROTTLE_EXPO >= 0.0f && DRIFT_THROTTLE_EXPO <= 1.0f, "DRIFT
 #define DRIFT_GYRO_REVERSED 0
 #endif
 
-// 1 writes the gamepad, status, gain and input lines to the serial port; 0 leaves only errors. Printing in the loop
+// 1 writes the controller, status, gain and input lines to the serial port; 0 leaves only errors. Printing in the loop
 // delays the servo and ESC, so it stays off unless a car is being set up or debugged.
 #ifndef DRIFT_LOG
 #define DRIFT_LOG 0
 #endif
 
-// How often, in milliseconds, the serial port gets a line of gamepad input while a gamepad drives and DRIFT_LOG is 1;
+// How often, in milliseconds, the serial port gets a line of input while a controller drives and DRIFT_LOG is 1;
 // 0 turns that line off.
 #ifndef DRIFT_LOG_INPUT_MS
 #define DRIFT_LOG_INPUT_MS 250
 #endif
+
+// Its arguments are not evaluated while DRIFT_LOG is 0, so a disabled log costs nothing in the loop.
+#define LOG(...)                  \
+  do {                            \
+    if (DRIFT_LOG) {              \
+      Serial.printf(__VA_ARGS__); \
+    }                             \
+  } while (0)
