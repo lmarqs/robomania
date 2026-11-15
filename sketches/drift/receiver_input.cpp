@@ -11,7 +11,7 @@ const uint32_t UPDATE_EVERY_MS = 10;
 static const RcChannel STICK(DRIFT_RECEIVER_LOW_US, DRIFT_RECEIVER_CENTER_US, DRIFT_RECEIVER_HIGH_US,
                              DRIFT_RECEIVER_DEAD_ZONE_US);
 
-static uint32_t pulseOf(EspPulseInPin& pin) {
+static uint32_t pulseOf(PulseInPin& pin) {
   const uint32_t widthUs = pin.read(DRIFT_RECEIVER_TIMEOUT_MS * 1000);
   return RcChannel::isServoPulse(widthUs) ? widthUs : 0;
 }

@@ -2,11 +2,10 @@
 
 #include <stdint.h>
 
-/** The duty that keeps a PWM pin high for the whole period, as PwmOutPin::DUTY_MAX. */
-const uint16_t PULSE_DUTY_MAX = 65535;
+#include "pin.h"
 
 /**
- * The duty, from 0 to PULSE_DUTY_MAX, that makes a pin running at `frequencyHz` hold each pulse high for `pulseUs`
+ * The duty, from 0 to PwmOutPin::DUTY_MAX, that makes a pin running at `frequencyHz` hold each pulse high for `pulseUs`
  * microseconds. It is rounded to the nearest step and clamped, so a pulse longer than the period keeps the pin high,
  * and a NaN pulse keeps it low.
  */

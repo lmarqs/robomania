@@ -17,8 +17,8 @@ void test_duty_rounds_to_the_nearest_step(void) {
 }
 
 void test_pulse_longer_than_the_period_keeps_the_pin_high(void) {
-  TEST_ASSERT_EQUAL(PULSE_DUTY_MAX, pulseDuty(20000.0f, 50));
-  TEST_ASSERT_EQUAL(PULSE_DUTY_MAX, pulseDuty(30000.0f, 50));
+  TEST_ASSERT_EQUAL(PwmOutPin::DUTY_MAX, pulseDuty(20000.0f, 50));
+  TEST_ASSERT_EQUAL(PwmOutPin::DUTY_MAX, pulseDuty(30000.0f, 50));
 }
 
 void test_zero_or_negative_pulse_keeps_the_pin_low(void) {
