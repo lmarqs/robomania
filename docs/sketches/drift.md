@@ -37,8 +37,8 @@ again.
 | 27 | MPU6050 SDA | `DRIFT_I2C_SDA_PIN` |
 | 26 | MPU6050 SCL | `DRIFT_I2C_SCL_PIN` |
 | 2 | The board's LED | `DRIFT_STATUS_LED` |
-| 5 | Receiver throttle channel, with `DRIFT_CONTROLLER_RECEIVER` | `DRIFT_RECEIVER_THROTTLE_PIN` |
-| 17 | Receiver steering channel, with `DRIFT_CONTROLLER_RECEIVER` | `DRIFT_RECEIVER_STEERING_PIN` |
+| 5 | Receiver steering channel, CH1 on a surface transmitter, with `DRIFT_CONTROLLER_RECEIVER` | `DRIFT_RECEIVER_STEERING_PIN` |
+| 17 | Receiver throttle channel, CH2 on a surface transmitter, with `DRIFT_CONTROLLER_RECEIVER` | `DRIFT_RECEIVER_THROTTLE_PIN` |
 | none | Receiver gain channel, with `DRIFT_CONTROLLER_RECEIVER` | `DRIFT_RECEIVER_GAIN_PIN` |
 
 Each pin but the LED's is a `#define` that `local.h` can change, as [Setting it up for a car](#setting-it-up-for-a-car)
@@ -126,7 +126,7 @@ Each setting is a `#define` in `sketches/drift/local.h`, which Git ignores; the 
 | --- | --- | --- |
 | `DRIFT_STEERING_LEFT_US`, `_CENTER_US`, `_RIGHT_US` | 1000, 1500, 2000 | The servo pulses at full left, straight ahead and full right. Set them to where the car's steering stops, so the servo never stalls against them. |
 | `DRIFT_CONTROLLER` | `DRIFT_CONTROLLER_GAMEPAD` | What drives the car, as [Choosing the controller](#choosing-the-controller) says. |
-| `DRIFT_RECEIVER_THROTTLE_PIN`, `_STEERING_PIN`, `_GAIN_PIN` | 5, 17, -1 | The GPIO of each receiver channel; a gain pin of -1 keeps the gain at `DRIFT_GAIN`. |
+| `DRIFT_RECEIVER_THROTTLE_PIN`, `_STEERING_PIN`, `_GAIN_PIN` | 17, 5, -1 | The GPIO of each receiver channel; a gain pin of -1 keeps the gain at `DRIFT_GAIN`. |
 | `DRIFT_RECEIVER_LOW_US`, `_CENTER_US`, `_HIGH_US` | 1000, 1500, 2000 | The receiver's pulses at one end, the centre and the other end of every channel. |
 | `DRIFT_RECEIVER_DEAD_ZONE_US` | 20 | How far from the centre pulse a channel still counts as centred. |
 | `DRIFT_RECEIVER_THROTTLE_REVERSED`, `_STEERING_REVERSED` | 0, 0 | 1 flips that channel. |
