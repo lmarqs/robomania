@@ -1,6 +1,7 @@
 #include "pulse_width.h"
 
-static float clamp(float value, float low, float high) { return value < low ? low : value > high ? high : value; }
+// Written so a NaN fails both comparisons and comes out as `low`, never as a NaN cast to an integer.
+static float clamp(float value, float low, float high) { return value >= low ? (value <= high ? value : high) : low; }
 
 uint16_t pulseDuty(float pulseUs, uint32_t frequencyHz) {
   const float duty = pulseUs * frequencyHz / 1000000.0f * PULSE_DUTY_MAX;
@@ -14,6 +15,9 @@ PulseRange::PulseRange(float lowUs, float centerUs, float highUs) {
 }
 
 float PulseRange::pulseUs(float position) const {
+  if (position != position) {
+    return centerUs;
+  }
   position = clamp(position, -1.0f, 1.0f);
   if (position >= 0.0f) {
     return centerUs + position * (highUs - centerUs);

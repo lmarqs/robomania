@@ -7,7 +7,8 @@ const uint16_t PULSE_DUTY_MAX = 65535;
 
 /**
  * The duty, from 0 to PULSE_DUTY_MAX, that makes a pin running at `frequencyHz` hold each pulse high for `pulseUs`
- * microseconds. It is rounded to the nearest step and clamped, so a pulse longer than the period keeps the pin high.
+ * microseconds. It is rounded to the nearest step and clamped, so a pulse longer than the period keeps the pin high,
+ * and a NaN pulse keeps it low.
  */
 uint16_t pulseDuty(float pulseUs, uint32_t frequencyHz);
 
@@ -24,7 +25,7 @@ class PulseRange {
 
   /**
    * The pulse, in microseconds, for `position` from -1 at `lowUs` through 0 at `centerUs` to 1 at `highUs`, each side
-   * scaled on its own. A position past either end is clamped to it.
+   * scaled on its own. A position past either end is clamped to it, and a NaN one gives `centerUs`.
    */
   float pulseUs(float position) const;
 };

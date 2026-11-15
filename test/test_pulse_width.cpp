@@ -1,6 +1,8 @@
 #include <host_test.h>
 #include <pulse_width.h>
 
+#include <cmath>
+
 void test_duty_is_the_pulse_share_of_the_period(void) {
   // 1500 µs of a 20 ms period is 7.5 %, and 65535 × 0.075 is 4915.125.
   TEST_ASSERT_EQUAL(4915, pulseDuty(1500.0f, 50));
@@ -23,6 +25,8 @@ void test_zero_or_negative_pulse_keeps_the_pin_low(void) {
   TEST_ASSERT_EQUAL(0, pulseDuty(0.0f, 50));
   TEST_ASSERT_EQUAL(0, pulseDuty(-10.0f, 50));
 }
+
+void test_nan_pulse_keeps_the_pin_low(void) { TEST_ASSERT_EQUAL(0, pulseDuty(NAN, 50)); }
 
 static PulseRange range() { return PulseRange(1000.0f, 1500.0f, 2000.0f); }
 
@@ -55,16 +59,22 @@ void test_range_with_low_at_center_runs_one_way(void) {
   TEST_ASSERT_FLOAT_WITHIN(1e-3f, 1000.0f, forwardOnly.pulseUs(-1.0f));
 }
 
+void test_range_maps_a_nan_position_to_its_center(void) {
+  TEST_ASSERT_FLOAT_WITHIN(1e-3f, 1500.0f, range().pulseUs(NAN));
+}
+
 int main(int, char**) {
   UNITY_BEGIN();
   RUN_TEST(test_duty_is_the_pulse_share_of_the_period);
   RUN_TEST(test_duty_rounds_to_the_nearest_step);
   RUN_TEST(test_pulse_longer_than_the_period_keeps_the_pin_high);
   RUN_TEST(test_zero_or_negative_pulse_keeps_the_pin_low);
+  RUN_TEST(test_nan_pulse_keeps_the_pin_low);
   RUN_TEST(test_range_maps_minus_one_zero_and_one_to_its_three_pulses);
   RUN_TEST(test_range_scales_each_side_on_its_own);
   RUN_TEST(test_range_clamps_a_position_past_either_end);
   RUN_TEST(test_reversed_range_maps_position_one_to_the_shorter_pulse);
   RUN_TEST(test_range_with_low_at_center_runs_one_way);
+  RUN_TEST(test_range_maps_a_nan_position_to_its_center);
   return UNITY_END();
 }
