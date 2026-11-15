@@ -184,8 +184,10 @@
 
   <rect class="hw" x="1110" y="716" width="250" height="140" rx="12"/>
   <text class="t3" x="1128" y="740">GPIO — BoardLed</text>
-  <text class="tx" x="1128" y="766">blinks 1 Hz: no gamepad</text>
-  <text class="tx" x="1128" y="786">steady: gamepad connected</text>
+  <text class="tx" x="1128" y="766">steady: gamepad + IMU ok</text>
+  <text class="tx" x="1128" y="786">short blink: IMU not ok</text>
+  <text class="tx" x="1128" y="806">long blink: no gamepad</text>
+  <text class="tx" x="1128" y="826">alternating: neither</text>
 
 
   <!-- Pins -->

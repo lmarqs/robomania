@@ -35,8 +35,21 @@ The MPU6050 lies flat, so its Z axis points up and its Z rate is the car's yaw r
 - **D-pad up and down**: the gyro's gain, in steps of 0.1 from 0 to 1. Each change prints `gain <value>` on the
   serial port at 115200 baud.
 
-The first gamepad to connect drives the car; the car forgets paired gamepads at every boot. The LED blinks once a
-second while no gamepad is connected and stays lit while one is.
+The first gamepad to connect drives the car; the car forgets paired gamepads at every boot.
+
+## Status LED
+
+The board's LED stays lit while a gamepad is connected and the MPU6050 works. Otherwise it blinks once a second:
+
+| LED | Means |
+| --- | --- |
+| Steady | Gamepad connected, MPU6050 working |
+| Short blink, 150 ms | MPU6050 not found at boot, or its last read failed |
+| Long blink, 600 ms | No gamepad connected |
+| Short and long blinks alternating | Neither |
+
+The MPU6050 is read only while a gamepad drives the car, so a sensor that stops answering shows only once a gamepad
+is connected.
 
 ## Boot
 

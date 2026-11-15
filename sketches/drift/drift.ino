@@ -10,7 +10,9 @@
 
 #include "./config.h"
 
-const uint32_t LED_BLINK_MS = 500;
+const uint32_t BLINK_SLOT_MS = 1000;
+const uint32_t SHORT_BLINK_MS = 150;
+const uint32_t LONG_BLINK_MS = 600;
 const int32_t STICK_MAX = 512;
 const int32_t STICK_DEAD_ZONE = 40;
 const int32_t TRIGGER_MAX = 1023;
@@ -27,7 +29,8 @@ static SteeringAssist assist(DRIFT_FULL_LOCK_DPS);
 static BoardLed led;
 
 static Controller* controller = nullptr;
-static bool imuReady = false;
+static bool imuFound = false;
+static bool imuOk = false;
 static float gain = DRIFT_GAIN;
 static uint8_t lastDpad = 0;
 
@@ -60,10 +63,26 @@ static void adjustGain(uint8_t dpad) {
 
 static float yawRateDps() {
   ImuSample sample;
-  if (!imuReady || !imu.read(sample)) {
+  if (!imuFound) {
+    return 0.0f;
+  }
+  imuOk = imu.read(sample);
+  if (!imuOk) {
     return 0.0f;
   }
   return DRIFT_GYRO_REVERSED ? -sample.gz : sample.gz;
+}
+
+/**
+ * Whether the LED is lit at `nowMs`: steady while the gamepad and the IMU both work; otherwise a short blink each
+ * second for the IMU, a long one for the gamepad, alternating when neither works.
+ */
+static bool statusLed(bool gamepadWorks, bool imuWorks, uint32_t nowMs) {
+  if (gamepadWorks && imuWorks) {
+    return true;
+  }
+  const bool showImu = gamepadWorks || (!imuWorks && (nowMs / BLINK_SLOT_MS) % 2 == 0);
+  return nowMs % BLINK_SLOT_MS < (showImu ? SHORT_BLINK_MS : LONG_BLINK_MS);
 }
 
 static void drive(Controller* c) {
@@ -87,8 +106,9 @@ void setup() {
   // A stalled read fails within 10 ms, where a hang would leave the car on its last command.
   Wire.setTimeOut(10);
   // The gyro's bias is measured now, so the car must stand still while it boots.
-  imuReady = imu.begin();
-  Serial.println(imuReady ? "MPU6050 ready" : "error MPU6050 not found, steering without assist");
+  imuFound = imu.begin();
+  imuOk = imuFound;
+  Serial.println(imuFound ? "MPU6050 ready" : "error MPU6050 not found, steering without assist");
 
   BP32.setup([](Controller* c) { controller = controller == nullptr ? c : controller; },
              [](Controller* c) {
@@ -106,7 +126,7 @@ void loop() {
   if (BP32.update() && controller && controller->isConnected() && controller->hasData()) {
     drive(controller);
   }
-  led.write(controller || (millis() / LED_BLINK_MS) % 2 ? HIGH : LOW);
+  led.write(statusLed(controller != nullptr, imuOk, millis()) ? HIGH : LOW);
   // Sleeps a tick so core 1's idle task runs; Bluepad32 delivers gamepad data far less often than this.
   delay(1);
 }
