@@ -4,6 +4,7 @@
 #include <esc.h>
 #include <imu.h>
 #include <ledc_pin.h>
+#include <pulse_width.h>
 #include <servo.h>
 #include <steering_assist.h>
 
@@ -26,6 +27,7 @@ static EspLedcOutPin escPin(ESC_PIN, 50, 16);
 static Servo steering(&steeringPin, min(DRIFT_STEERING_LEFT_US, DRIFT_STEERING_RIGHT_US),
                       max(DRIFT_STEERING_LEFT_US, DRIFT_STEERING_RIGHT_US));
 static ReversibleEsc esc(&escPin);
+static const PulseRange steeringRange(DRIFT_STEERING_LEFT_US, DRIFT_STEERING_CENTER_US, DRIFT_STEERING_RIGHT_US);
 static Mpu6050Imu imu(&Wire);
 static SteeringAssist assist(DRIFT_FULL_LOCK_DPS);
 static BoardLed led;
@@ -52,10 +54,7 @@ static void setStatus(uint8_t bit, bool works) {
 /** RC expo: the same ends, a flatter middle, so small stick moves give finer control. */
 static float expo(float value, float amount) { return (1.0f - amount) * value + amount * value * value * value; }
 
-static void writeSteering(float steer) {
-  const float toward = steer >= 0.0f ? DRIFT_STEERING_RIGHT_US : DRIFT_STEERING_LEFT_US;
-  steering.writeMicroseconds(lroundf(DRIFT_STEERING_CENTER_US + fabsf(steer) * (toward - DRIFT_STEERING_CENTER_US)));
-}
+static void writeSteering(float steer) { steering.writeMicroseconds(lroundf(steeringRange.pulseUs(steer))); }
 
 static void stop() {
   esc.write(0.0f);
