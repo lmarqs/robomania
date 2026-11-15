@@ -5,4 +5,6 @@
 set -euo pipefail
 
 # arduino-cli finds no serial monitor while the cores are installed only per sketch profile, so pyserial's runs.
-python3 -m serial.tools.miniterm "${usage_port}" "${usage_baudrate}" --raw
+# DTR and RTS drive an ESP32 board's EN and IO0: held asserted, as miniterm does by default, they kept the drift
+# sketch resetting in setup().
+python3 -m serial.tools.miniterm "${usage_port}" "${usage_baudrate}" --raw --dtr 0 --rts 0
