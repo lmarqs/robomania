@@ -192,8 +192,8 @@
   <g>
     <rect class="pin" x="150" y="868" width="80" height="28" rx="6"/><text class="mono" x="160" y="887">GPIO23</text>
     <rect class="pin" x="270" y="868" width="80" height="28" rx="6"/><text class="mono" x="280" y="887">GPIO21</text>
-    <rect class="pin" x="520" y="868" width="80" height="28" rx="6" style="stroke: var(--warn)"/><text class="mono" x="530" y="887">GPIO12</text>
-    <rect class="pin" x="660" y="868" width="80" height="28" rx="6"/><text class="mono" x="670" y="887">GPIO13</text>
+    <rect class="pin" x="520" y="868" width="80" height="28" rx="6"/><text class="mono" x="530" y="887">GPIO27</text>
+    <rect class="pin" x="660" y="868" width="80" height="28" rx="6"/><text class="mono" x="670" y="887">GPIO26</text>
     <rect class="pin" x="860" y="868" width="80" height="28" rx="6"/><text class="mono" x="870" y="887">TX/RX</text>
     <rect class="pin" x="1195" y="868" width="80" height="28" rx="6"/><text class="mono" x="1212" y="887">GPIO2</text>
     <text class="sm" x="530" y="912">SDA</text><text class="sm" x="670" y="912">SCL</text>
@@ -228,12 +228,4 @@
   <path class="wire" d="M900,856 L900,866"/>
   <path class="wire" d="M1235,856 L1235,866"/>
 
-  <!-- Warnings -->
-  <rect class="task" x="1040" y="920" width="320" height="120" rx="10" style="stroke: var(--warn)"/>
-  <text class="t3 warn" x="1056" y="944">⚠ GPIO12 is a strapping pin</text>
-  <text class="sm" x="1056" y="964">High at reset selects 1.8 V flash and a</text>
-  <text class="sm" x="1056" y="980">WROOM-32 does not boot. A GY-521's</text>
-  <text class="sm" x="1056" y="996">pull-up on SDA holds it high. Move SDA</text>
-  <text class="sm" x="1056" y="1012">with DRIFT_I2C_SDA_PIN if the board</text>
-  <text class="sm" x="1056" y="1028">won't start with the sensor wired.</text>
 </svg>

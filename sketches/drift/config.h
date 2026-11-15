@@ -6,8 +6,7 @@
 #include "local.h"
 #endif
 
-// ESP32 WROOM-32 GPIO numbers. GPIO12 straps the flash voltage: held high at reset, it selects 1.8 V and the board
-// fails to boot, which a sensor board's pull-up on SDA does.
+// ESP32 WROOM-32 GPIO numbers.
 #ifndef DRIFT_ESC_PIN
 #define DRIFT_ESC_PIN 21
 #endif
@@ -15,10 +14,10 @@
 #define DRIFT_STEERING_PIN 23
 #endif
 #ifndef DRIFT_I2C_SDA_PIN
-#define DRIFT_I2C_SDA_PIN 12
+#define DRIFT_I2C_SDA_PIN 27
 #endif
 #ifndef DRIFT_I2C_SCL_PIN
-#define DRIFT_I2C_SCL_PIN 13
+#define DRIFT_I2C_SCL_PIN 26
 #endif
 const uint8_t ESC_PIN = DRIFT_ESC_PIN;
 const uint8_t STEERING_PIN = DRIFT_STEERING_PIN;

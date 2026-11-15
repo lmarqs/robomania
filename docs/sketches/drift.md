@@ -18,15 +18,13 @@ spin so the car holds the drift. The gyro acts on the steering only; the throttl
 | --- | --- | --- |
 | 21 | ESC signal | `DRIFT_ESC_PIN` |
 | 23 | Steering servo signal | `DRIFT_STEERING_PIN` |
-| 12 | MPU6050 SDA | `DRIFT_I2C_SDA_PIN` |
-| 13 | MPU6050 SCL | `DRIFT_I2C_SCL_PIN` |
+| 27 | MPU6050 SDA | `DRIFT_I2C_SDA_PIN` |
+| 26 | MPU6050 SCL | `DRIFT_I2C_SCL_PIN` |
 | 2 | The board's LED | |
 
 Each pin but the LED's is a `#define` that `local.h` can change, as [Setting it up for a car](#setting-it-up-for-a-car)
-says. GPIO12 sets the flash voltage at reset: held high while the board boots, it selects 1.8 V and the board does not
-start. An MPU6050 breakout such as the GY-521 pulls SDA up to its supply, so with SDA on GPIO12 a WROOM-32 board fails
-to boot unless the pull-up is removed or the flash voltage is fixed in eFuse. Move SDA with `DRIFT_I2C_SDA_PIN` if the
-board does not boot with the sensor connected.
+says. GPIO12 is not one to pick for SDA: it sets the flash voltage at reset, and an MPU6050 breakout's pull-up on SDA
+holds it high, which selects 1.8 V and the board does not boot.
 
 The MPU6050 lies flat, so its Z axis points up and its Z rate is the car's yaw rate.
 
