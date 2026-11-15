@@ -18,12 +18,12 @@ void ARDUINO_ISR_ATTR EspPulseInPin::onEdge(void* self) {
   const bool high = digitalRead(input->pin) == HIGH;
   portENTER_CRITICAL_ISR(&input->lock);
   // A falling edge counts only after a rising one, so the first pulse after begin() is never half of one.
-  if (!high && input->rising) {
-    input->widthUs = nowUs - input->riseUs;
+  if (!high && input->high) {
+    input->widthUs = nowUs - input->lastEdgeUs;
     input->endUs = nowUs;
   }
-  input->rising = high;
-  input->riseUs = nowUs;
+  input->high = high;
+  input->lastEdgeUs = nowUs;
   portEXIT_CRITICAL_ISR(&input->lock);
 }
 

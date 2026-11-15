@@ -13,8 +13,8 @@ class EspPulseInPin : public PulseInPin {
  private:
   uint8_t pin;
   portMUX_TYPE lock = portMUX_INITIALIZER_UNLOCKED;
-  bool rising = false;
-  uint32_t riseUs = 0;
+  bool high = false;
+  uint32_t lastEdgeUs = 0;
   uint32_t widthUs = 0;
   uint32_t endUs = 0;
 
@@ -22,7 +22,7 @@ class EspPulseInPin : public PulseInPin {
 
  public:
   explicit EspPulseInPin(uint8_t pin);
-  bool begin();
-  uint32_t read(uint32_t maxAgeUs);
+  bool begin() override;
+  uint32_t read(uint32_t maxAgeUs) override;
 };
 #endif

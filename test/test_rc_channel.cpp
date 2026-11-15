@@ -44,6 +44,18 @@ void test_level_is_clamped(void) {
   TEST_ASSERT_FLOAT_WITHIN(1e-6f, 1.0f, channel().level(2200));
 }
 
+void test_widths_from_500_to_2500_us_are_servo_pulses(void) {
+  TEST_ASSERT_TRUE(RcChannel::isServoPulse(500));
+  TEST_ASSERT_TRUE(RcChannel::isServoPulse(1500));
+  TEST_ASSERT_TRUE(RcChannel::isServoPulse(2500));
+}
+
+void test_widths_outside_500_to_2500_us_are_noise(void) {
+  TEST_ASSERT_FALSE(RcChannel::isServoPulse(0));
+  TEST_ASSERT_FALSE(RcChannel::isServoPulse(499));
+  TEST_ASSERT_FALSE(RcChannel::isServoPulse(2501));
+}
+
 int main(int, char**) {
   UNITY_BEGIN();
   RUN_TEST(test_centre_pulse_is_position_zero);
@@ -56,5 +68,7 @@ int main(int, char**) {
   RUN_TEST(test_reversed_channel_maps_low_pulse_to_position_one);
   RUN_TEST(test_level_runs_from_zero_at_low_to_one_at_high);
   RUN_TEST(test_level_is_clamped);
+  RUN_TEST(test_widths_from_500_to_2500_us_are_servo_pulses);
+  RUN_TEST(test_widths_outside_500_to_2500_us_are_noise);
   return UNITY_END();
 }

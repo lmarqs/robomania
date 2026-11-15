@@ -12,6 +12,9 @@ class RcChannel {
   int32_t lowUs, centerUs, highUs, deadZoneUs;
 
  public:
+  /** Whether `widthUs` is a servo pulse, 500 to 2500 µs; a receiver sends nothing else, so any other width is noise. */
+  static bool isServoPulse(uint32_t widthUs);
+
   /** A pulse within `deadZoneUs` of `centerUs` reads as the centre, so a stick that rests a little off still stops. */
   RcChannel(uint32_t lowUs, uint32_t centerUs, uint32_t highUs, uint32_t deadZoneUs);
 
