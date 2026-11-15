@@ -1,14 +1,15 @@
 #include <Arduino.h>
-#include <Preferences.h>
 #include <Wire.h>
 #include <esc.h>
 #include <imu.h>
 #include <ledc_pin.h>
 #include <serial_io.h>
+#include <serial_settings.h>
+#include <settings_store.h>
 
 #include "./balancer.h"
+#include "./beam_settings.h"
 #include "./config.h"
-#include "./config_command.h"
 #include "./tuning_server.h"
 
 // 14 bits is the finest LEDC resolution the ESP32-C3 has, and at 200 Hz one step of it is 0.3 µs. The ESCs take
@@ -31,16 +32,11 @@ static Mpu6050Imu imu(&Wire);
 static Balancer balancer(ComplementaryFilter(FILTER_ALPHA), PidController({KP, KI, KD}, 0.0f, 0.0f),
                          Mixer(0.0f, 0.0f, 0.0f), 0.0f);
 
-static const char* const NVS_NAMESPACE = "bbcfg";
 // NVS keys are at most 15 characters, which angle_offset_deg exceeds, so they differ from the protocol's keys.
-static const char* const NVS_KEYS[CONFIG_FIELD_COUNT] = {"ap_ssid", "ap_pass", "angle_off", "thr_min",
+static const char* const NVS_KEYS[BEAM_SETTING_COUNT] = {"ap_ssid", "ap_pass", "angle_off", "thr_min",
                                                          "thr_mid", "thr_max", "tilt_lim"};
-
-static const ConfigDefaults CONFIG_DEFAULTS{DEFAULT_AP_SSID,       DEFAULT_AP_PASSWORD,  DEFAULT_ANGLE_OFFSET_DEG,
-                                            DEFAULT_THROTTLE_MIN,  DEFAULT_THROTTLE_MID, DEFAULT_THROTTLE_MAX,
-                                            DEFAULT_TILT_LIMIT_DEG};
-
-static StoredConfig storedConfig = emptyConfig();
+static NvsSettingsStore settingsStore("bbcfg", NVS_KEYS);
+static SerialSettings storedSettings(BEAM_SETTINGS, BEAM_SETTING_COUNT, settingsStore, checkThrottleOrder);
 // Written in setup() before the control task starts, and only read after.
 static BoardSettings settings;
 static SerialInput serialInput;
@@ -178,47 +174,6 @@ static void handleCommand(String line) {
   }
 }
 
-static void loadConfig() {
-  Preferences prefs;
-  if (!prefs.begin(NVS_NAMESPACE)) {
-    log_e("the stored settings are unreadable, so the defaults apply");
-    return;
-  }
-  for (int i = 0; i < CONFIG_FIELD_COUNT; i++) {
-    const ConfigField field = static_cast<ConfigField>(i);
-    if (!prefs.isKey(NVS_KEYS[field])) {
-      continue;
-    }
-    bool kept;
-    if (configFieldIsText(field)) {
-      char text[CONFIG_PASSWORD_MAX + 2];
-      text[0] = '\0';
-      prefs.getString(NVS_KEYS[field], text, sizeof(text));
-      kept = restoreText(storedConfig, field, text);
-    } else {
-      kept = restoreNumber(storedConfig, field, prefs.getFloat(NVS_KEYS[field], NAN));
-    }
-    if (!kept) {
-      log_w("the stored %s is invalid and ignored", configKey(field));
-    }
-  }
-  prefs.end();
-}
-
-static void saveConfig(ConfigField field) {
-  Preferences prefs;
-  if (!prefs.begin(NVS_NAMESPACE)) {
-    log_e("the %s could not be saved", configKey(field));
-    return;
-  }
-  const bool saved = configFieldIsText(field) ? prefs.putString(NVS_KEYS[field], storedText(storedConfig, field)) > 0
-                                              : prefs.putFloat(NVS_KEYS[field], storedNumber(storedConfig, field)) > 0;
-  prefs.end();
-  if (!saved) {
-    log_e("the %s could not be saved", configKey(field));
-  }
-}
-
 // Settings are read at boot, so a new value takes effect after `cfg restart`. The reply goes out raw, a line the
 // page recognizes by its "cfg " start, and not through the log.
 static void handleConfigCommand(const char* line) {
@@ -228,13 +183,11 @@ static void handleConfigCommand(const char* line) {
 #else
   const bool motorsCanRun = enabled;
 #endif
-  char reply[CONFIG_REPLY_MAX];
-  const ConfigResult result = handleConfigLine(line, storedConfig, CONFIG_DEFAULTS, motorsCanRun, reply, sizeof(reply));
-  if (result.action == ConfigAction::Save) {
-    saveConfig(result.field);
-  }
+  // Static rather than on the control task's stack, which is sized for the control loop.
+  static char reply[SETTINGS_REPLY_MAX];
+  const SettingsAction action = storedSettings.handle(line, reply, sizeof(reply), motorsCanRun ? "armed" : nullptr);
   Serial.print(reply);
-  if (result.action == ConfigAction::Restart) {
+  if (action == SettingsAction::Restart) {
     // The ESCs get the minimum pulse for a control period first, so a restart never cuts the signal while they run.
     esc1.write(0.0f);
     esc2.write(0.0f);
@@ -247,7 +200,7 @@ static void handleConfigCommand(const char* line) {
 static void pollSerial() {
   while (serialInput.ready()) {
     const String line = serialInput.take();
-    if (isConfigLine(line.c_str())) {
+    if (SerialSettings::isLine(line.c_str())) {
       handleConfigCommand(line.c_str());
     } else {
       handleCommand(line.c_str());
@@ -287,8 +240,8 @@ void setup() {
   Serial.setDebugOutput(true);
   log_i("boot, disarmed. Arm from the page; the ESCs' supply has its own switch.");
 
-  loadConfig();
-  settings = activeSettings(storedConfig, CONFIG_DEFAULTS);
+  storedSettings.begin();
+  settings = activeSettings(storedSettings);
   if (settings.bandRejected) {
     log_e("the throttles break 0 <= min <= mid <= max <= 1, so the band is 0 and no motor spins");
   }
