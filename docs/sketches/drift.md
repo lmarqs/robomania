@@ -32,7 +32,8 @@ The MPU6050 lies flat, so its Z axis points up and its Z rate is the car's yaw r
 
 - **Left stick, sideways**: steering. A deflection under 40 of 512 counts as centred.
 - **Right stick, up and down**: up drives forward; down brakes, then reverses, as the ESC does it. The throttle
-  follows how far the stick is pushed, with the same dead zone as the steering.
+  follows how far the stick is pushed, through the `DRIFT_THROTTLE_EXPO` curve, with the same dead zone as the
+  steering.
 - **D-pad up and down**: the gyro's gain, in steps of 0.1 from 0 to 1. Each change prints `gain <value>` on the
   serial port at 115200 baud.
 
@@ -78,6 +79,7 @@ Each setting is a `#define` in `sketches/drift/local.h`, which Git ignores; the 
 | --- | --- | --- |
 | `DRIFT_STEERING_LEFT_US`, `_CENTER_US`, `_RIGHT_US` | 1000, 1500, 2000 | The servo pulses at full left, straight ahead and full right. Set them to where the car's steering stops, so the servo never stalls against them. |
 | `DRIFT_THROTTLE_MAX` | 0.5 | The largest throttle the right stick reaches, as a fraction of the ESC's range each way. |
+| `DRIFT_THROTTLE_EXPO` | 0.67 | The throttle's expo, 0 to 1: the throttle is (1 − expo) × stick + expo × stick³ of `DRIFT_THROTTLE_MAX`, so half stick gives about a quarter at 0.67. |
 | `DRIFT_GAIN` | 0 | The gain at boot. |
 | `DRIFT_FULL_LOCK_DPS` | 200 | The yaw rate, in °/s, at which a gain of 1 alone steers to full lock. |
 | `DRIFT_GYRO_REVERSED` | 0 | 1 flips the counter-steer, for a sensor mounted upside down. |

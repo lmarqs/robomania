@@ -55,6 +55,9 @@ static void logGamepad(const char* event, Controller* c) {
                 a[5]);
 }
 
+/** RC expo: the same ends, a flatter middle, so small stick moves give finer control. */
+static float expo(float value, float amount) { return (1.0f - amount) * value + amount * value * value * value; }
+
 static float stickToUnit(int32_t value) {
   if (abs(value) < STICK_DEAD_ZONE) {
     return 0.0f;
@@ -111,7 +114,7 @@ static bool statusLed(uint8_t working, uint32_t nowMs) {
 static void drive(Controller* c) {
   adjustGain(c->dpad());
   // Bluepad32 reports a stick pushed down as positive, so up on the right stick drives forward.
-  const float throttle = -stickToUnit(c->axisRY()) * DRIFT_THROTTLE_MAX;
+  const float throttle = expo(-stickToUnit(c->axisRY()), DRIFT_THROTTLE_EXPO) * DRIFT_THROTTLE_MAX;
   const float yaw = yawRateDps();
   const float steer = assist.steer(stickToUnit(c->axisX()), yaw, gain);
   esc.write(throttle);

@@ -42,6 +42,13 @@ const uint8_t I2C_SCL_PIN = DRIFT_I2C_SCL_PIN;
 #endif
 static_assert(DRIFT_THROTTLE_MAX >= 0.0f && DRIFT_THROTTLE_MAX <= 1.0f, "DRIFT_THROTTLE_MAX must be 0 to 1");
 
+// The throttle's expo, from 0 (linear) to 1 (cubic): the output is (1 - expo) * stick + expo * stick^3, so full stick
+// still gives full throttle and half stick gives less than half.
+#ifndef DRIFT_THROTTLE_EXPO
+#define DRIFT_THROTTLE_EXPO 0.67f
+#endif
+static_assert(DRIFT_THROTTLE_EXPO >= 0.0f && DRIFT_THROTTLE_EXPO <= 1.0f, "DRIFT_THROTTLE_EXPO must be 0 to 1");
+
 // The yaw rate, in degrees per second, at which a gain of 1 alone steers to full lock.
 #ifndef DRIFT_FULL_LOCK_DPS
 #define DRIFT_FULL_LOCK_DPS 200.0f
