@@ -31,7 +31,8 @@ The MPU6050 lies flat, so its Z axis points up and its Z rate is the car's yaw r
 ## Controls
 
 - **Left stick, sideways**: steering. A deflection under 40 of 512 counts as centred.
-- **Right trigger**: forward. **Left trigger**: brake, then reverse, as the ESC does it.
+- **Right stick, up and down**: up drives forward; down brakes, then reverses, as the ESC does it. The throttle
+  follows how far the stick is pushed, with the same dead zone as the steering.
 - **D-pad up and down**: the gyro's gain, in steps of 0.1 from 0 to 1. Each change prints `gain <value>` on the
   serial port at 115200 baud.
 
@@ -60,12 +61,12 @@ The sketch writes to the serial port at 115200 baud, between Bluepad32's own lin
 | `gamepad <n> connected: <model>, vid <vid> pid <pid>, <address>` | A gamepad connects and drives the car. `ignored, another drives` instead of `connected` means a second gamepad connected and does not drive. |
 | `gamepad <n> disconnected: …` | That gamepad disconnects. |
 | `status gamepad connected\|missing, imu working\|failed` | Either changes; the LED shows the same. |
-| `input x … throttle … brake … dpad … buttons … battery … \| yaw … steer … esc …` | Every `DRIFT_LOG_INPUT_MS` while a gamepad drives: the raw stick, triggers, D-pad, buttons and battery, then the yaw rate in °/s and the steering and throttle sent, each -1 to 1. |
+| `input lx … ry … dpad … buttons … battery … \| yaw … steer … esc …` | Every `DRIFT_LOG_INPUT_MS` while a gamepad drives: the raw left stick X and right stick Y, from -511 to 512 with down positive, the D-pad, buttons and battery, then the yaw rate in °/s and the steering and throttle sent, each -1 to 1. |
 | `gain <value>` | At boot and at each gain change. |
 
 
 The car must stand still while it boots: the sketch measures the gyro's bias then, for about a second. The ESC gets
-the neutral pulse from power-on, which it needs to arm, so the motor stays stopped until a trigger is pressed.
+the neutral pulse from power-on, which it needs to arm, so the motor stays stopped until the right stick moves.
 Without an MPU6050 the car boots, prints `error MPU6050 not found, steering without assist` and drives as plain RC.
 
 ## Setting it up for a car
@@ -76,7 +77,7 @@ Each setting is a `#define` in `sketches/drift/local.h`, which Git ignores; the 
 | Setting | Default | What it sets |
 | --- | --- | --- |
 | `DRIFT_STEERING_LEFT_US`, `_CENTER_US`, `_RIGHT_US` | 1000, 1500, 2000 | The servo pulses at full left, straight ahead and full right. Set them to where the car's steering stops, so the servo never stalls against them. |
-| `DRIFT_THROTTLE_MAX` | 0.5 | The largest throttle the triggers reach, as a fraction of the ESC's range each way. |
+| `DRIFT_THROTTLE_MAX` | 0.5 | The largest throttle the right stick reaches, as a fraction of the ESC's range each way. |
 | `DRIFT_GAIN` | 0 | The gain at boot. |
 | `DRIFT_FULL_LOCK_DPS` | 200 | The yaw rate, in °/s, at which a gain of 1 alone steers to full lock. |
 | `DRIFT_GYRO_REVERSED` | 0 | 1 flips the counter-steer, for a sensor mounted upside down. |

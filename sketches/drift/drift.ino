@@ -15,7 +15,6 @@ const uint32_t SHORT_BLINK_MS = 150;
 const uint32_t LONG_BLINK_MS = 600;
 const int32_t STICK_MAX = 512;
 const int32_t STICK_DEAD_ZONE = 40;
-const int32_t TRIGGER_MAX = 1023;
 const float GAIN_STEP = 0.1f;
 
 const uint8_t STATUS_GAMEPAD = 1 << 0;
@@ -111,7 +110,8 @@ static bool statusLed(uint8_t working, uint32_t nowMs) {
 
 static void drive(Controller* c) {
   adjustGain(c->dpad());
-  const float throttle = constrain((float)(c->throttle() - c->brake()) / TRIGGER_MAX, -1.0f, 1.0f) * DRIFT_THROTTLE_MAX;
+  // Bluepad32 reports a stick pushed down as positive, so up on the right stick drives forward.
+  const float throttle = -stickToUnit(c->axisRY()) * DRIFT_THROTTLE_MAX;
   const float yaw = yawRateDps();
   const float steer = assist.steer(stickToUnit(c->axisX()), yaw, gain);
   esc.write(throttle);
@@ -120,8 +120,8 @@ static void drive(Controller* c) {
   const uint32_t now = millis();
   if (DRIFT_LOG_INPUT_MS > 0 && now - lastInputLogMs >= DRIFT_LOG_INPUT_MS) {
     lastInputLogMs = now;
-    Serial.printf("input x %d throttle %d brake %d dpad %02x buttons %04x battery %u | yaw %.1f steer %.2f esc %.2f\n",
-                  c->axisX(), c->throttle(), c->brake(), c->dpad(), c->buttons(), c->battery(), yaw, steer, throttle);
+    Serial.printf("input lx %d ry %d dpad %02x buttons %04x battery %u | yaw %.1f steer %.2f esc %.2f\n", c->axisX(),
+                  c->axisRY(), c->dpad(), c->buttons(), c->battery(), yaw, steer, throttle);
   }
 }
 

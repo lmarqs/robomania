@@ -36,7 +36,7 @@ const uint8_t I2C_SCL_PIN = DRIFT_I2C_SCL_PIN;
 #define DRIFT_STEERING_RIGHT_US 2000
 #endif
 
-// The largest throttle the triggers reach, as a fraction of the ESC's range each way.
+// The largest throttle the right stick reaches, as a fraction of the ESC's range each way.
 #ifndef DRIFT_THROTTLE_MAX
 #define DRIFT_THROTTLE_MAX 0.5f
 #endif

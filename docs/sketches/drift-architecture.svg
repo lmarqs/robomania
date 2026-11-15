@@ -50,7 +50,7 @@
   <text class="t2" x="60" y="140">Gamepad</text>
   <text class="tx" x="60" y="164">Bluetooth Classic / BLE</text>
   <text class="sm" x="60" y="186">left stick X → steering</text>
-  <text class="sm" x="60" y="203">R2 fwd · L2 brake / rev</text>
+  <text class="sm" x="60" y="203">right stick Y ↑ fwd · ↓ brake / rev</text>
   <text class="sm" x="60" y="220">D-pad ↑↓ → gyro gain ±0.1</text>
 
   <!-- ESP32 chip -->
