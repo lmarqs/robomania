@@ -99,6 +99,8 @@ The drivers in `lib/`:
 | `serial_io.*` | The serial port as lines: read without waiting, printed with `Print` |
 | `ledc_pin.*` | A PWM pin through the ESP32 LEDC peripheral, on a channel it allocates |
 | `h_bridge.*` | A motor through a full or half H-bridge |
+| `pulse_in_pin.*` | The width of the pulses a pin receives, such as an RC receiver channel's, timed by interrupt on an ESP32 |
+| `rc_channel.*` | An RC receiver channel's pulse width as a stick position or a knob level |
 | `servo.*` | A positional (180°) or continuous-rotation (360°) hobby servo on a PWM pin |
 | `esc.*` | A motor through its electronic speed controller on a PWM pin: a forward-only brushless one, or an RC car's that also reverses |
 | `imu.*` | An MPU6050 accelerometer and gyroscope on I2C |

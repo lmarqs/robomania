@@ -8,9 +8,11 @@ audience: Whoever picks a sketch to flash, drives a robot, or changes a sketch's
   tuned from a page.
 - [Blink](blink.md): four steps from a LED that toggles on GPIO 2, proving a build, an upload and the board work, to
   one that takes commands over serial.
-- [Drift](drift.md): drives an RC drift car from a gamepad, with a gyro that counter-steers to hold a slide.
+- [Drift](drift.md): drives an RC drift car from a gamepad or an RC receiver, with a gyro that counter-steers to hold a slide.
 - [Omnidirectional](omnidirectional.md): drives a four-wheel robot from a gamepad or an I2C master, and stops when
   its input goes quiet.
+- [RC receiver](rc-receiver.md): prints the pulse width on each pin a PWM RC receiver's channels are wired to, to map
+  the wiring.
 - [Servo](servo.md): four steps from a sweep of a hobby servo on GPIO 13, checking the servo and its wiring, to one
   that moves at a speed you set.
 - [USB key](usb-key.md): types one password as a USB keyboard when a Digispark ATtiny85 is plugged in.
