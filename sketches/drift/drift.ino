@@ -107,6 +107,6 @@ void loop() {
     drive(controller);
   }
   led.write(controller || (millis() / LED_BLINK_MS) % 2 ? HIGH : LOW);
-  // Yields to the idle task, which feeds the watchdog; Bluepad32 delivers gamepad data far less often than this.
+  // Sleeps a tick so core 1's idle task runs; Bluepad32 delivers gamepad data far less often than this.
   delay(1);
 }
