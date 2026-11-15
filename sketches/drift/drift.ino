@@ -37,8 +37,24 @@ static bool imuFound = false;
 static uint8_t status = 0;
 static float gain = DRIFT_GAIN;
 static uint8_t lastDpad = 0;
+static uint32_t lastInputLogMs = 0;
 
-static void setStatus(uint8_t bit, bool works) { status = works ? status | bit : status & ~bit; }
+static void setStatus(uint8_t bit, bool works) {
+  const uint8_t next = works ? status | bit : status & ~bit;
+  if (next != status) {
+    Serial.printf("status gamepad %s, imu %s\n", next & STATUS_GAMEPAD ? "connected" : "missing",
+                  next & STATUS_IMU ? "working" : "failed");
+  }
+  status = next;
+}
+
+static void logGamepad(const char* event, Controller* c) {
+  const ControllerProperties properties = c->getProperties();
+  const uint8_t* a = properties.btaddr;
+  Serial.printf("gamepad %d %s: %s, vid %04x pid %04x, %02X:%02X:%02X:%02X:%02X:%02X\n", c->index(), event,
+                c->getModelName().c_str(), properties.vendor_id, properties.product_id, a[0], a[1], a[2], a[3], a[4],
+                a[5]);
+}
 
 static float stickToUnit(int32_t value) {
   if (abs(value) < STICK_DEAD_ZONE) {
@@ -95,9 +111,18 @@ static bool statusLed(uint8_t working, uint32_t nowMs) {
 
 static void drive(Controller* c) {
   adjustGain(c->dpad());
-  const float throttle = (float)(c->throttle() - c->brake()) / TRIGGER_MAX;
-  esc.write(constrain(throttle, -1.0f, 1.0f) * DRIFT_THROTTLE_MAX);
-  writeSteering(assist.steer(stickToUnit(c->axisX()), yawRateDps(), gain));
+  const float throttle = constrain((float)(c->throttle() - c->brake()) / TRIGGER_MAX, -1.0f, 1.0f) * DRIFT_THROTTLE_MAX;
+  const float yaw = yawRateDps();
+  const float steer = assist.steer(stickToUnit(c->axisX()), yaw, gain);
+  esc.write(throttle);
+  writeSteering(steer);
+
+  const uint32_t now = millis();
+  if (DRIFT_LOG_INPUT_MS > 0 && now - lastInputLogMs >= DRIFT_LOG_INPUT_MS) {
+    lastInputLogMs = now;
+    Serial.printf("input x %d throttle %d brake %d dpad %02x buttons %04x battery %u | yaw %.1f steer %.2f esc %.2f\n",
+                  c->axisX(), c->throttle(), c->brake(), c->dpad(), c->buttons(), c->battery(), yaw, steer, throttle);
+  }
 }
 
 void setup() {
@@ -120,17 +145,23 @@ void setup() {
 
   BP32.setup(
       [](Controller* c) {
-        if (controller == nullptr) {
-          controller = c;
-          setStatus(STATUS_GAMEPAD, true);
+        if (controller != nullptr) {
+          logGamepad("ignored, another drives", c);
+          return;
         }
+        controller = c;
+        logGamepad("connected", c);
+        setStatus(STATUS_GAMEPAD, true);
       },
       [](Controller* c) {
-        if (controller == c) {
-          controller = nullptr;
-          setStatus(STATUS_GAMEPAD, false);
-          stop();
+        if (controller != c) {
+          logGamepad("disconnected, was ignored", c);
+          return;
         }
+        controller = nullptr;
+        logGamepad("disconnected", c);
+        setStatus(STATUS_GAMEPAD, false);
+        stop();
       });
   BP32.forgetBluetoothKeys();
   BP32.enableVirtualDevice(false);

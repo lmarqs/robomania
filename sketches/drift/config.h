@@ -57,3 +57,8 @@ static_assert(DRIFT_THROTTLE_MAX >= 0.0f && DRIFT_THROTTLE_MAX <= 1.0f, "DRIFT_T
 #ifndef DRIFT_GYRO_REVERSED
 #define DRIFT_GYRO_REVERSED 0
 #endif
+
+// How often, in milliseconds, the serial port gets a line of gamepad input while a gamepad drives; 0 turns it off.
+#ifndef DRIFT_LOG_INPUT_MS
+#define DRIFT_LOG_INPUT_MS 250
+#endif

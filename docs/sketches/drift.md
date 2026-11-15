@@ -51,7 +51,18 @@ The board's LED stays lit while a gamepad is connected and the MPU6050 works. Ot
 The MPU6050 is read only while a gamepad drives the car, so a sensor that stops answering shows only once a gamepad
 is connected.
 
-## Boot
+## Serial log
+
+The sketch writes to the serial port at 115200 baud, between Bluepad32's own lines:
+
+| Line | When |
+| --- | --- |
+| `gamepad <n> connected: <model>, vid <vid> pid <pid>, <address>` | A gamepad connects and drives the car. `ignored, another drives` instead of `connected` means a second gamepad connected and does not drive. |
+| `gamepad <n> disconnected: …` | That gamepad disconnects. |
+| `status gamepad connected\|missing, imu working\|failed` | Either changes; the LED shows the same. |
+| `input x … throttle … brake … dpad … buttons … battery … \| yaw … steer … esc …` | Every `DRIFT_LOG_INPUT_MS` while a gamepad drives: the raw stick, triggers, D-pad, buttons and battery, then the yaw rate in °/s and the steering and throttle sent, each -1 to 1. |
+| `gain <value>` | At boot and at each gain change. |
+
 
 The car must stand still while it boots: the sketch measures the gyro's bias then, for about a second. The ESC gets
 the neutral pulse from power-on, which it needs to arm, so the motor stays stopped until a trigger is pressed.
@@ -69,6 +80,7 @@ Each setting is a `#define` in `sketches/drift/local.h`, which Git ignores; the 
 | `DRIFT_GAIN` | 0 | The gain at boot. |
 | `DRIFT_FULL_LOCK_DPS` | 200 | The yaw rate, in °/s, at which a gain of 1 alone steers to full lock. |
 | `DRIFT_GYRO_REVERSED` | 0 | 1 flips the counter-steer, for a sensor mounted upside down. |
+| `DRIFT_LOG_INPUT_MS` | 250 | How often, in ms, the input line is written while a gamepad drives; 0 turns it off. |
 
 To check the counter-steer's direction: with the car lifted, raise the gain to 0.5 and turn the car clockwise by hand,
 seen from above. The front wheels must turn left. If they turn right, set `DRIFT_GYRO_REVERSED` to 1.
