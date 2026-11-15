@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <Bluepad32.h>
 #include <Wire.h>
-#include <digital_pin.h>
+#include <board_led.h>
 #include <esc.h>
 #include <imu.h>
 #include <ledc_pin.h>
@@ -24,7 +24,7 @@ static Servo steering(&steeringPin, min(DRIFT_STEERING_LEFT_US, DRIFT_STEERING_R
 static ReversibleEsc esc(&escPin);
 static Mpu6050Imu imu(&Wire);
 static SteeringAssist assist(DRIFT_FULL_LOCK_DPS);
-static DigitalOutPin led(LED_PIN);
+static BoardLed led;
 
 static Controller* controller = nullptr;
 static bool imuReady = false;
