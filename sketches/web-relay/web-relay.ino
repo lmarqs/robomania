@@ -4,6 +4,8 @@
 #include <board_led.h>
 #include <digital_pin.h>
 #include <serial_io.h>
+#include <serial_settings.h>
+#include <settings_store.h>
 
 #if defined(ESP8266)
 #include <ESP8266WebServer.h>
@@ -18,7 +20,6 @@ using HttpServer = WebServer;
 #include "./blink_controller.h"
 #include "./blink_setting.h"
 #include "./blink_setting_update.h"
-#include "./config_command.h"
 #include "./data/index.html.h"
 
 #if __has_include("local.h")
@@ -51,12 +52,24 @@ static const size_t BLINK_SETTING_OFFSET = 0;
 static const size_t CONFIG_OFFSET = 16;
 static_assert(CONFIG_OFFSET >= BLINK_SETTING_OFFSET + sizeof(BlinkSetting),
               "the serial settings overlap the blink setting");
-static_assert(CONFIG_OFFSET + sizeof(StoredConfig) <= EEPROM_SIZE, "the serial settings do not fit in the EEPROM");
 
-static const ConfigDefaults CONFIG_DEFAULTS{WEB_RELAY_AP_SSID, WEB_RELAY_AP_PASSWORD, WEB_RELAY_OTA_PASSWORD};
+enum SettingIndex : uint8_t { AP_SSID, AP_PASSWORD, OTA_PASSWORD, SETTING_COUNT };
+static constexpr SettingField SETTINGS[SETTING_COUNT] = {
+    SettingField::text("ap_ssid", 1, 32, WEB_RELAY_AP_SSID),
+    SettingField::secret("ap_password", 8, 63, WEB_RELAY_AP_PASSWORD),
+    SettingField::secret("ota_password", 8, 63, WEB_RELAY_OTA_PASSWORD),
+};
+static_assert(CONFIG_OFFSET + EepromSettingsStore::size(SETTINGS, SETTING_COUNT) <= EEPROM_SIZE,
+              "the serial settings do not fit in the EEPROM");
+// The record the sketch has stored since its first release, so a board keeps its values across an update.
+static const uint8_t CONFIG_MAGIC = 0xC5;
+static const uint8_t CONFIG_VERSION = 1;
+static_assert(EepromSettingsStore::size(SETTINGS, SETTING_COUNT) == 163,
+              "the stored record changed: raise CONFIG_VERSION, then this size");
 
 static BlinkController blinker;
-static StoredConfig config = emptyConfig();
+static EepromSettingsStore settingsStore(CONFIG_OFFSET, CONFIG_MAGIC, CONFIG_VERSION);
+static SerialSettings settings(SETTINGS, SETTING_COUNT, settingsStore);
 static SerialInput serialInput;
 static SerialOutput serialOutput;
 static HttpServer server(80);
@@ -89,32 +102,14 @@ static void saveSetting() {
   EEPROM.commit();
 }
 
-static void loadConfig() {
-  StoredConfig raw{};
-  EEPROM.get(CONFIG_OFFSET, raw);
-  config = storedConfigFrom(raw);
-}
-
-static void saveConfig() {
-  EEPROM.put(CONFIG_OFFSET, config);
-  EEPROM.commit();
-}
-
 // Serial settings are read at boot, so a new value takes effect after `cfg restart`.
 static void handleSerialLine(const char* line) {
-  char reply[CONFIG_REPLY_MAX];
-  const ConfigAction action = handleConfigLine(line, config, CONFIG_DEFAULTS, reply, sizeof(reply));
-  if (action == ConfigAction::Save) {
-    saveConfig();
-  }
+  char reply[SETTINGS_REPLY_MAX];
+  const SettingsAction action = settings.handle(line, reply, sizeof(reply));
   serialOutput.print(reply);
-  switch (action) {
-    case ConfigAction::Restart:
-      serialOutput.flush();
-      ESP.restart();
-      break;
-    default:
-      break;
+  if (action == SettingsAction::Restart) {
+    serialOutput.flush();
+    ESP.restart();
   }
 }
 
@@ -170,14 +165,14 @@ void setup() {
   serialOutput.begin("web-relay");
   EEPROM.begin(EEPROM_SIZE);
   loadSetting();
-  loadConfig();
+  settings.begin();
 
-  const char* apSsid = effectiveApSsid(config, CONFIG_DEFAULTS);
+  const char* apSsid = settings.text(AP_SSID);
   WiFi.mode(WIFI_AP);
-  WiFi.softAP(apSsid, effectiveApPassword(config, CONFIG_DEFAULTS));
+  WiFi.softAP(apSsid, settings.text(AP_PASSWORD));
   serialOutput.printf("\nAP \"%s\" up at %s\n", apSsid, WiFi.softAPIP().toString().c_str());
 
-  ArduinoOTA.setPassword(effectiveOtaPassword(config, CONFIG_DEFAULTS));
+  ArduinoOTA.setPassword(settings.text(OTA_PASSWORD));
   ArduinoOTA.begin();
 
   server.on("/", HTTP_GET, handleIndex);
