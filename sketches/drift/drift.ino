@@ -18,6 +18,10 @@ const int32_t STICK_DEAD_ZONE = 40;
 const int32_t TRIGGER_MAX = 1023;
 const float GAIN_STEP = 0.1f;
 
+const uint8_t STATUS_GAMEPAD = 1 << 0;
+const uint8_t STATUS_IMU = 1 << 1;
+const uint8_t STATUS_ALL = STATUS_GAMEPAD | STATUS_IMU;
+
 // The servo and the ESC share one 50 Hz LEDC timer; 16 bits make a step of 0.3 µs at that rate.
 static EspLedcOutPin steeringPin(STEERING_PIN, 50, 16);
 static EspLedcOutPin escPin(ESC_PIN, 50, 16);
@@ -30,9 +34,11 @@ static BoardLed led;
 
 static Controller* controller = nullptr;
 static bool imuFound = false;
-static bool imuOk = false;
+static uint8_t status = 0;
 static float gain = DRIFT_GAIN;
 static uint8_t lastDpad = 0;
+
+static void setStatus(uint8_t bit, bool works) { status = works ? status | bit : status & ~bit; }
 
 static float stickToUnit(int32_t value) {
   if (abs(value) < STICK_DEAD_ZONE) {
@@ -66,22 +72,24 @@ static float yawRateDps() {
   if (!imuFound) {
     return 0.0f;
   }
-  imuOk = imu.read(sample);
-  if (!imuOk) {
+  const bool read = imu.read(sample);
+  setStatus(STATUS_IMU, read);
+  if (!read) {
     return 0.0f;
   }
   return DRIFT_GYRO_REVERSED ? -sample.gz : sample.gz;
 }
 
 /**
- * Whether the LED is lit at `nowMs`: steady while the gamepad and the IMU both work; otherwise a short blink each
- * second for the IMU, a long one for the gamepad, alternating when neither works.
+ * Whether the LED is lit at `nowMs`: steady while everything in STATUS_ALL works; otherwise a short blink each second
+ * for the IMU, a long one for the gamepad, alternating when neither works.
  */
-static bool statusLed(bool gamepadWorks, bool imuWorks, uint32_t nowMs) {
-  if (gamepadWorks && imuWorks) {
+static bool statusLed(uint8_t working, uint32_t nowMs) {
+  const uint8_t missing = working ^ STATUS_ALL;
+  if (!missing) {
     return true;
   }
-  const bool showImu = gamepadWorks || (!imuWorks && (nowMs / BLINK_SLOT_MS) % 2 == 0);
+  const bool showImu = missing == STATUS_IMU || (missing == STATUS_ALL && (nowMs / BLINK_SLOT_MS) % 2 == 0);
   return nowMs % BLINK_SLOT_MS < (showImu ? SHORT_BLINK_MS : LONG_BLINK_MS);
 }
 
@@ -107,16 +115,23 @@ void setup() {
   Wire.setTimeOut(10);
   // The gyro's bias is measured now, so the car must stand still while it boots.
   imuFound = imu.begin();
-  imuOk = imuFound;
+  setStatus(STATUS_IMU, imuFound);
   Serial.println(imuFound ? "MPU6050 ready" : "error MPU6050 not found, steering without assist");
 
-  BP32.setup([](Controller* c) { controller = controller == nullptr ? c : controller; },
-             [](Controller* c) {
-               if (controller == c) {
-                 controller = nullptr;
-                 stop();
-               }
-             });
+  BP32.setup(
+      [](Controller* c) {
+        if (controller == nullptr) {
+          controller = c;
+          setStatus(STATUS_GAMEPAD, true);
+        }
+      },
+      [](Controller* c) {
+        if (controller == c) {
+          controller = nullptr;
+          setStatus(STATUS_GAMEPAD, false);
+          stop();
+        }
+      });
   BP32.forgetBluetoothKeys();
   BP32.enableVirtualDevice(false);
   Serial.printf("gain %.1f\n", gain);
@@ -126,7 +141,7 @@ void loop() {
   if (BP32.update() && controller && controller->isConnected() && controller->hasData()) {
     drive(controller);
   }
-  led.write(statusLed(controller != nullptr, imuOk, millis()) ? HIGH : LOW);
+  led.write(statusLed(status, millis()) ? HIGH : LOW);
   // Sleeps a tick so core 1's idle task runs; Bluepad32 delivers gamepad data far less often than this.
   delay(1);
 }
