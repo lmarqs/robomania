@@ -12,13 +12,18 @@ spin so the car holds the drift. The gyro acts on the steering only; the throttl
 
 ## Wiring
 
-| GPIO | To |
-| --- | --- |
-| 13 | Steering servo signal |
-| 14 | ESC signal |
-| 21 | MPU6050 SDA |
-| 22 | MPU6050 SCL |
-| 2 | The board's LED |
+| GPIO | To | Setting |
+| --- | --- | --- |
+| 13 | ESC signal | `DRIFT_ESC_PIN` |
+| 12 | Steering servo signal | `DRIFT_STEERING_PIN` |
+| 21 | MPU6050 SDA | `DRIFT_I2C_SDA_PIN` |
+| 22 | MPU6050 SCL | `DRIFT_I2C_SCL_PIN` |
+| 2 | The board's LED | `DRIFT_LED_PIN` |
+
+Each pin is a `#define` that `local.h` can change, as [Setting it up for a car](#setting-it-up-for-a-car) says.
+GPIO12 sets the flash voltage at reset: anything that holds it high while the board boots, such as a pull-up on the
+servo's signal line, keeps the board from starting. Move the servo with `DRIFT_STEERING_PIN` if the board does not
+boot with it connected.
 
 The MPU6050 lies flat, so its Z axis points up and its Z rate is the car's yaw rate.
 
