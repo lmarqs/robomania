@@ -130,8 +130,8 @@
     <text class="sm" x="916" y="455">stick − gain × gz / 200 °/s, clamped to ±1</text>
 
     <circle class="step" cx="896" cy="486" r="11"/><text class="steptext" x="892" y="490">6</text>
-    <text class="mono" x="916" y="483">steering.writeMicroseconds(…)</text>
-    <text class="sm" x="916" y="499">left / centre / right µs from config.h</text>
+    <text class="mono" x="916" y="483">steering.write(steer)</text>
+    <text class="sm" x="916" y="499">PulseOut: −1…1 → left / centre / right µs from config.h</text>
 
     <circle class="step" cx="896" cy="530" r="11"/><text class="steptext" x="892" y="534">7</text>
     <text class="mono" x="916" y="527">led.write(); delay(1)</text>

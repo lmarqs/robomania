@@ -25,14 +25,18 @@ The firmware has five parts:
   one firmware image, for one robot or for trying one driver on a board. A sketch is a folder with a `sketch.yaml`;
   a folder without one is searched a level down. A sketch says which device sits on which pin, and holds its robot's
   control logic. Its path under `sketches/` names it in the firmware manifest and its image folder.
-- **Pin interfaces**, in `lib/`: the kinds of pin output a driver can ask for, such as a level or a PWM signal, each
-  with a class per way the ESP32 produces it.
-- **Drivers**, in `lib/`: one library that the ESP sketches build with. Each driver runs one sort of device, such
-  as a motor, a servo or a camera, serves one protocol, or does one control calculation, such as a PID controller.
-  The [README](../README.md#code-layout) lists them.
+- **Pin interfaces**, in `lib/`: the kinds of pin a driver can ask for, in or out, each in the unit its hardware
+  works in: a level, a PWM duty out, or a pulse width in. The interfaces build without the Arduino core, so a test
+  can stand in a pin of its own; a file per kind of pin holds the classes that give it on a board.
+- **Drivers**, in `lib/`: one library that the ESP sketches build with. Each driver runs one sort of device, such as a
+  motor, a servo or a camera, serves one protocol, or does one control calculation, such as a PID controller. The
+  [README](../README.md#code-layout) lists them. The drivers that speak servo-style pulses, the servos and ESCs, share
+  one path from a position to a pulse to a duty, and reading a receiver's pulse back to a position runs the same range
+  the other way.
 - **Tests**, in `test/`: programs that run the drivers on the developer's machine, with no board. Automated tests
-  cover only `lib/`, and of it the drivers that compute without touching hardware. A sketch is checked by compiling
-  it and by running it on its board.
+  cover only `lib/`: the drivers that compute without touching hardware, and those that reach the hardware only
+  through a pin interface, run against a pin the test fakes. A sketch is checked by compiling it and by running it on
+  its board.
 - **Core**: the Arduino core that each sketch's `sketch.yaml` pins for its board. The ESP32 sketches pin the
   Bluepad32 ESP32 core, which gives the Arduino API, ESP-IDF and the Bluetooth gamepad stack. `sketches/web-relay`
   pins the ESP8266 core for the ESP-01S and, in its `esp32` profile, the Bluepad32 core, and `sketches/usb-key` the
@@ -50,8 +54,9 @@ flowchart TD
 
 Dependencies point one way: sketches depend on drivers, pin interfaces and the core, and drivers on pin interfaces and
 the core; nothing in `lib/` depends on a sketch or on a test. Drivers reach the hardware only through the pin
-interfaces, so a driver runs on any pin that gives the output it needs. A few drivers call ESP-IDF directly and build
-only for ESP32; the rest use only the Arduino API, and the ones under test use neither.
+interfaces, so a driver runs on any pin that gives the output it needs, and a test runs it on a pin it fakes. A few
+drivers call ESP-IDF directly and build only for ESP32; the rest use only the Arduino API, and the ones under test use
+neither.
 
 A sketch takes the values that differ from one build of its robot to the next, such as a password or a throttle
 range, from a `local.h` in its folder. Git ignores the file, so a secret stays out of the history, and a sketch
