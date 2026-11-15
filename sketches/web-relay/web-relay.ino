@@ -104,7 +104,7 @@ static void saveSetting() {
 
 // Serial settings are read at boot, so a new value takes effect after `cfg restart`.
 static void handleSerialLine(const char* line) {
-  char reply[SETTINGS_REPLY_MAX];
+  static char reply[SETTINGS_REPLY_MAX];
   const SettingsAction action = settings.handle(line, reply, sizeof(reply));
   serialOutput.print(reply);
   if (action == SettingsAction::Restart) {
