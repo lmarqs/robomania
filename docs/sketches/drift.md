@@ -35,7 +35,7 @@ The MPU6050 lies flat, so its Z axis points up and its Z rate is the car's yaw r
   follows how far the stick is pushed, through the `DRIFT_THROTTLE_EXPO` curve, with the same dead zone as the
   steering.
 - **D-pad up and down**: the gyro's gain, in steps of 0.1 from 0 to 1. Each change prints `gain <value>` on the
-  serial port at 115200 baud.
+  serial port when [the log](#serial-log) is on.
 
 The first gamepad to connect drives the car; the car forgets paired gamepads at every boot.
 
@@ -55,7 +55,9 @@ is connected.
 
 ## Serial log
 
-The sketch writes to the serial port at 115200 baud, between Bluepad32's own lines:
+The sketch writes errors to the serial port at 115200 baud, such as `error MPU6050 not found`. With `DRIFT_LOG` set to
+1 it also writes these lines, between Bluepad32's own; it is off by default because printing in the loop delays the
+servo and ESC:
 
 | Line | When |
 | --- | --- |
@@ -83,7 +85,8 @@ Each setting is a `#define` in `sketches/drift/local.h`, which Git ignores; the 
 | `DRIFT_GAIN` | 0 | The gain at boot. |
 | `DRIFT_FULL_LOCK_DPS` | 200 | The yaw rate, in °/s, at which a gain of 1 alone steers to full lock. |
 | `DRIFT_GYRO_REVERSED` | 0 | 1 flips the counter-steer, for a sensor mounted upside down. |
-| `DRIFT_LOG_INPUT_MS` | 250 | How often, in ms, the input line is written while a gamepad drives; 0 turns it off. |
+| `DRIFT_LOG` | 0 | 1 writes the gamepad, status, gain and input lines of the [serial log](#serial-log). |
+| `DRIFT_LOG_INPUT_MS` | 250 | How often, in ms, the input line is written while a gamepad drives and `DRIFT_LOG` is 1; 0 turns it off. |
 
 To check the counter-steer's direction: with the car lifted, raise the gain to 0.5 and turn the car clockwise by hand,
 seen from above. The front wheels must turn left. If they turn right, set `DRIFT_GYRO_REVERSED` to 1.

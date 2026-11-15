@@ -65,7 +65,14 @@ static_assert(DRIFT_THROTTLE_EXPO >= 0.0f && DRIFT_THROTTLE_EXPO <= 1.0f, "DRIFT
 #define DRIFT_GYRO_REVERSED 0
 #endif
 
-// How often, in milliseconds, the serial port gets a line of gamepad input while a gamepad drives; 0 turns it off.
+// 1 writes the gamepad, status, gain and input lines to the serial port; 0 leaves only errors. Printing in the loop
+// delays the servo and ESC, so it stays off unless a car is being set up or debugged.
+#ifndef DRIFT_LOG
+#define DRIFT_LOG 0
+#endif
+
+// How often, in milliseconds, the serial port gets a line of gamepad input while a gamepad drives and DRIFT_LOG is 1;
+// 0 turns that line off.
 #ifndef DRIFT_LOG_INPUT_MS
 #define DRIFT_LOG_INPUT_MS 250
 #endif

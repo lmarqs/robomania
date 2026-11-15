@@ -10,6 +10,14 @@
 
 #include "./config.h"
 
+// Its arguments are not evaluated while DRIFT_LOG is 0, so a disabled log costs nothing in the loop.
+#define LOG(...)                  \
+  do {                            \
+    if (DRIFT_LOG) {              \
+      Serial.printf(__VA_ARGS__); \
+    }                             \
+  } while (0)
+
 const uint32_t BLINK_SLOT_MS = 1000;
 const uint32_t SHORT_BLINK_MS = 150;
 const uint32_t LONG_BLINK_MS = 600;
@@ -41,8 +49,8 @@ static uint32_t lastInputLogMs = 0;
 static void setStatus(uint8_t bit, bool works) {
   const uint8_t next = works ? status | bit : status & ~bit;
   if (next != status) {
-    Serial.printf("status gamepad %s, imu %s\n", next & STATUS_GAMEPAD ? "connected" : "missing",
-                  next & STATUS_IMU ? "working" : "failed");
+    LOG("status gamepad %s, imu %s\n", next & STATUS_GAMEPAD ? "connected" : "missing",
+        next & STATUS_IMU ? "working" : "failed");
   }
   status = next;
 }
@@ -50,9 +58,8 @@ static void setStatus(uint8_t bit, bool works) {
 static void logGamepad(const char* event, Controller* c) {
   const ControllerProperties properties = c->getProperties();
   const uint8_t* a = properties.btaddr;
-  Serial.printf("gamepad %d %s: %s, vid %04x pid %04x, %02X:%02X:%02X:%02X:%02X:%02X\n", c->index(), event,
-                c->getModelName().c_str(), properties.vendor_id, properties.product_id, a[0], a[1], a[2], a[3], a[4],
-                a[5]);
+  LOG("gamepad %d %s: %s, vid %04x pid %04x, %02X:%02X:%02X:%02X:%02X:%02X\n", c->index(), event,
+      c->getModelName().c_str(), properties.vendor_id, properties.product_id, a[0], a[1], a[2], a[3], a[4], a[5]);
 }
 
 /** RC expo: the same ends, a flatter middle, so small stick moves give finer control. */
@@ -82,7 +89,7 @@ static void adjustGain(uint8_t dpad) {
     return;
   }
   gain = constrain(gain + (pressed & DPAD_UP ? GAIN_STEP : -GAIN_STEP), 0.0f, 1.0f);
-  Serial.printf("gain %.1f\n", gain);
+  LOG("gain %.1f\n", gain);
 }
 
 static float yawRateDps() {
@@ -121,10 +128,10 @@ static void drive(Controller* c) {
   writeSteering(steer);
 
   const uint32_t now = millis();
-  if (DRIFT_LOG_INPUT_MS > 0 && now - lastInputLogMs >= DRIFT_LOG_INPUT_MS) {
+  if (DRIFT_LOG && DRIFT_LOG_INPUT_MS > 0 && now - lastInputLogMs >= DRIFT_LOG_INPUT_MS) {
     lastInputLogMs = now;
-    Serial.printf("input lx %d ry %d dpad %02x buttons %04x battery %u | yaw %.1f steer %.2f esc %.2f\n", c->axisX(),
-                  c->axisRY(), c->dpad(), c->buttons(), c->battery(), yaw, steer, throttle);
+    LOG("input lx %d ry %d dpad %02x buttons %04x battery %u | yaw %.1f steer %.2f esc %.2f\n", c->axisX(), c->axisRY(),
+        c->dpad(), c->buttons(), c->battery(), yaw, steer, throttle);
   }
 }
 
@@ -144,7 +151,11 @@ void setup() {
   // The gyro's bias is measured now, so the car must stand still while it boots.
   imuFound = imu.begin();
   setStatus(STATUS_IMU, imuFound);
-  Serial.println(imuFound ? "MPU6050 ready" : "error MPU6050 not found, steering without assist");
+  if (imuFound) {
+    LOG("MPU6050 ready\n");
+  } else {
+    Serial.println("error MPU6050 not found, steering without assist");
+  }
 
   BP32.setup(
       [](Controller* c) {
@@ -168,7 +179,7 @@ void setup() {
       });
   BP32.forgetBluetoothKeys();
   BP32.enableVirtualDevice(false);
-  Serial.printf("gain %.1f\n", gain);
+  LOG("gain %.1f\n", gain);
 }
 
 void loop() {

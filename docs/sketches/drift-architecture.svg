@@ -178,8 +178,8 @@
   <rect class="hw" x="830" y="716" width="250" height="140" rx="12"/>
   <text class="t3" x="848" y="740">UART0 — 115200 baud</text>
   <text class="sm" x="848" y="760">USB serial on the dev board</text>
-  <text class="tx" x="848" y="786">gain changes, errors,</text>
-  <text class="tx" x="848" y="806">"MPU6050 ready"</text>
+  <text class="tx" x="848" y="786">errors; with DRIFT_LOG 1:</text>
+  <text class="tx" x="848" y="806">gamepad, status, gain, input</text>
   <text class="sm" x="848" y="830">Serial.printf from ArduinoTask</text>
 
   <rect class="hw" x="1110" y="716" width="250" height="140" rx="12"/>
