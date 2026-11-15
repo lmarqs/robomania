@@ -1,6 +1,7 @@
 #include "esc.h"
 
-// The minimum pulse sits at both the low end and the centre of the range, so throttles 0 to 1 span it.
+// The minimum pulse sits at both the low end and the centre of the range, so throttles 0 to 1 span it and a
+// negative one stays at the minimum.
 Esc::Esc(PwmOutPin* pwm, uint32_t minPulseUs, uint32_t maxPulseUs) : range(minPulseUs, minPulseUs, maxPulseUs) {
   this->pwm = pwm;
 }
@@ -11,7 +12,7 @@ bool Esc::begin() {
   return ready;
 }
 
-float Esc::pulseUs(float throttle) const { return range.pulseUs(constrain(throttle, 0.0f, 1.0f)); }
+float Esc::pulseUs(float throttle) const { return range.pulseUs(throttle); }
 
 void Esc::write(float throttle) {
   if (!ready) {
