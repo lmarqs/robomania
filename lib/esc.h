@@ -1,20 +1,17 @@
 #pragma once
 
-#include <Arduino.h>
+#include <stdint.h>
 
 #include "pin.h"
-#include "pulse_width.h"
+#include "pulse_out.h"
 
 /**
- * An electronic speed controller for a brushless motor, driven by pulse width on a PWM pin, such as an
- * EspLedcOutPin at 200 Hz. The pulse is computed from the pin's full duty range, so it moves in steps finer than a
- * microsecond.
+ * An electronic speed controller for a brushless motor that spins one way, driven by pulse width on a PWM pin, such as
+ * an EspPwmOutPin at 200 Hz. Throttle 0 is the minimum pulse, which stops the motor.
  */
 class Esc {
  private:
-  PwmOutPin* pwm;
-  PulseRange range;
-  bool ready = false;
+  PulseOut out;
 
  public:
   Esc(PwmOutPin* pwm, uint32_t minPulseUs = 1000, uint32_t maxPulseUs = 2000);
@@ -25,7 +22,7 @@ class Esc {
    */
   bool begin();
 
-  /** Sets the throttle, from 0 (the minimum pulse, motor stopped) to 1 (the maximum pulse). */
+  /** Sets the throttle, from 0 (the minimum pulse, motor stopped) to 1 (the maximum pulse); below 0 stays stopped. */
   void write(float throttle);
 
   /** The pulse width, in microseconds, that write() sends for `throttle`. */
@@ -34,14 +31,12 @@ class Esc {
 
 /**
  * An electronic speed controller that drives forward and in reverse, such as an RC car's, driven by pulse width on a
- * PWM pin, such as an EspLedcOutPin at 50 Hz. The neutral pulse stops the motor; a longer one drives forward and a
- * shorter one brakes or reverses, as the ESC decides.
+ * PWM pin, such as an EspPwmOutPin at 50 Hz. Throttle 0 is the neutral pulse, which stops the motor; a longer one
+ * drives forward and a shorter one brakes or reverses, as the ESC decides.
  */
 class ReversibleEsc {
  private:
-  PwmOutPin* pwm;
-  PulseRange range;
-  bool ready = false;
+  PulseOut out;
 
  public:
   ReversibleEsc(PwmOutPin* pwm, uint32_t minPulseUs = 1000, uint32_t neutralPulseUs = 1500, uint32_t maxPulseUs = 2000);

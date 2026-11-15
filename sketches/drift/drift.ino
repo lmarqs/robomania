@@ -4,8 +4,7 @@
 #include <esc.h>
 #include <imu.h>
 #include <ledc_pin.h>
-#include <pulse_width.h>
-#include <servo.h>
+#include <pulse_out.h>
 #include <steering_assist.h>
 
 #include "./config.h"
@@ -24,10 +23,9 @@ const uint8_t STATUS_ALL = STATUS_CONTROLLER | STATUS_IMU;
 // The servo and the ESC share one 50 Hz LEDC timer; 16 bits make a step of 0.3 µs at that rate.
 static EspLedcOutPin steeringPin(STEERING_PIN, 50, 16);
 static EspLedcOutPin escPin(ESC_PIN, 50, 16);
-static Servo steering(&steeringPin, min(DRIFT_STEERING_LEFT_US, DRIFT_STEERING_RIGHT_US),
-                      max(DRIFT_STEERING_LEFT_US, DRIFT_STEERING_RIGHT_US));
+static PulseOut steering(&steeringPin,
+                         PulseRange(DRIFT_STEERING_LEFT_US, DRIFT_STEERING_CENTER_US, DRIFT_STEERING_RIGHT_US));
 static ReversibleEsc esc(&escPin);
-static const PulseRange steeringRange(DRIFT_STEERING_LEFT_US, DRIFT_STEERING_CENTER_US, DRIFT_STEERING_RIGHT_US);
 static Mpu6050Imu imu(&Wire);
 static SteeringAssist assist(DRIFT_FULL_LOCK_DPS);
 static BoardLed led;
@@ -54,11 +52,10 @@ static void setStatus(uint8_t bit, bool works) {
 /** RC expo: the same ends, a flatter middle, so small stick moves give finer control. */
 static float expo(float value, float amount) { return (1.0f - amount) * value + amount * value * value * value; }
 
-static void writeSteering(float steer) { steering.writeMicroseconds(lroundf(steeringRange.pulseUs(steer))); }
 
 static void stop() {
   esc.write(0.0f);
-  writeSteering(0.0f);
+  steering.write(0.0f);
 }
 
 static float yawRateDps() {
@@ -103,7 +100,7 @@ static void drive(const DriveCommand& command) {
   const float yaw = yawRateDps();
   const float steer = assist.steer(command.steer, yaw, command.gain);
   esc.write(throttle);
-  writeSteering(steer);
+  steering.write(steer);
   logInput(command, yaw, steer, throttle);
 }
 

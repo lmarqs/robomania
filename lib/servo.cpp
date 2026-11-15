@@ -1,38 +1,26 @@
 #include "servo.h"
 
-#include <Arduino.h>
-
-#include "pulse_width.h"
-
-Servo::Servo(PwmOutPin* pwm, uint32_t minPulseUs, uint32_t maxPulseUs) {
-  this->pwm = pwm;
-  this->minPulseUs = minPulseUs;
-  this->maxPulseUs = maxPulseUs;
-}
-
-bool Servo::begin() { return pwm->begin(); }
-
-void Servo::writeMicroseconds(uint32_t pulseUs) {
-  pulseUs = constrain(pulseUs, minPulseUs, maxPulseUs);
-  pwm->write(pulseDuty(pulseUs, pwm->frequency()));
+// A servo's travel is linear from the shortest pulse to the longest, so the centre is half way.
+static PulseRange linearRange(uint32_t minPulseUs, uint32_t maxPulseUs) {
+  return PulseRange(minPulseUs, (minPulseUs + maxPulseUs) / 2.0f, maxPulseUs);
 }
 
 PositionalServo::PositionalServo(PwmOutPin* pwm, uint16_t range, uint32_t minPulseUs, uint32_t maxPulseUs)
-    : Servo(pwm, minPulseUs, maxPulseUs) {
-  this->range = range;
-}
+    : out(pwm, linearRange(minPulseUs, maxPulseUs)), range(range) {}
 
-void PositionalServo::write(int32_t angle) {
-  angle = constrain(angle, 0, range);
-  writeMicroseconds(map(angle, 0, range, minPulseUs, maxPulseUs));
-}
+bool PositionalServo::begin() { return out.begin(); }
+
+static float positionOf(int32_t angle, uint16_t range) { return 2.0f * angle / range - 1.0f; }
+
+void PositionalServo::write(int32_t angle) { out.write(positionOf(angle, range)); }
+
+float PositionalServo::pulseUs(int32_t angle) const { return out.pulseUs(positionOf(angle, range)); }
 
 ContinuousServo::ContinuousServo(PwmOutPin* pwm, uint32_t minPulseUs, uint32_t maxPulseUs)
-    : Servo(pwm, minPulseUs, maxPulseUs) {}
+    : out(pwm, linearRange(minPulseUs, maxPulseUs)) {}
 
-void ContinuousServo::move(int32_t speed) {
-  speed = constrain(speed, -100, 100);
-  writeMicroseconds(map(speed, -100, 100, minPulseUs, maxPulseUs));
-}
+bool ContinuousServo::begin() { return out.begin(); }
 
-void ContinuousServo::stop() { writeMicroseconds((minPulseUs + maxPulseUs) / 2); }
+void ContinuousServo::move(int32_t speed) { out.write(speed / 100.0f); }
+
+void ContinuousServo::stop() { out.write(0.0f); }
