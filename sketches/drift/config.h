@@ -46,19 +46,16 @@ const uint8_t I2C_SCL_PIN = DRIFT_I2C_SCL_PIN;
 #define DRIFT_STEERING_RIGHT_US 2000
 #endif
 
-// The receiver's channel pins; a gain pin of -1 leaves the gain at DRIFT_GAIN.
+// The receiver's channel pins.
 #ifndef DRIFT_RECEIVER_THROTTLE_PIN
 #define DRIFT_RECEIVER_THROTTLE_PIN 17
 #endif
 #ifndef DRIFT_RECEIVER_STEERING_PIN
 #define DRIFT_RECEIVER_STEERING_PIN 5
 #endif
-#ifndef DRIFT_RECEIVER_GAIN_PIN
-#define DRIFT_RECEIVER_GAIN_PIN -1
-#endif
 
 // The receiver's pulses at one end, the centre and the other end of every channel, and the dead zone around the
-// centre. A transmitter's end points and trims set the channel to match.
+// centre. A transmitter's end points, trims and channel reverse set the channel to match.
 #ifndef DRIFT_RECEIVER_LOW_US
 #define DRIFT_RECEIVER_LOW_US 1000
 #endif
@@ -70,14 +67,6 @@ const uint8_t I2C_SCL_PIN = DRIFT_I2C_SCL_PIN;
 #endif
 #ifndef DRIFT_RECEIVER_DEAD_ZONE_US
 #define DRIFT_RECEIVER_DEAD_ZONE_US 20
-#endif
-
-// 1 flips a receiver channel, for a transmitter whose stick drives the car the wrong way.
-#ifndef DRIFT_RECEIVER_THROTTLE_REVERSED
-#define DRIFT_RECEIVER_THROTTLE_REVERSED 0
-#endif
-#ifndef DRIFT_RECEIVER_STEERING_REVERSED
-#define DRIFT_RECEIVER_STEERING_REVERSED 0
 #endif
 
 // How long, in milliseconds, the throttle or steering channel may go without a pulse before the car stops.
@@ -131,11 +120,3 @@ static_assert(DRIFT_THROTTLE_EXPO >= 0.0f && DRIFT_THROTTLE_EXPO <= 1.0f, "DRIFT
 #ifndef DRIFT_LOG_INPUT_MS
 #define DRIFT_LOG_INPUT_MS 250
 #endif
-
-// Its arguments are not evaluated while DRIFT_LOG is 0, so a disabled log costs nothing in the loop.
-#define LOG(...)                  \
-  do {                            \
-    if (DRIFT_LOG) {              \
-      Serial.printf(__VA_ARGS__); \
-    }                             \
-  } while (0)

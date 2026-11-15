@@ -1,6 +1,6 @@
 #include "./gamepad_input.h"
 
-#include "./config.h"
+#include "./log.h"
 
 const int32_t STICK_MAX = 512;
 const int32_t STICK_DEAD_ZONE = 40;
@@ -67,17 +67,11 @@ void GamepadInput::adjustGain(uint8_t dpad) {
 }
 
 DriveCommand GamepadInput::command() {
-  if (!connected()) {
-    return {0.0f, 0.0f, gain};
-  }
   // Bluepad32 reports a stick pushed down as positive, so up on the right stick drives forward.
   return {stickToUnit(controller->axisX()), -stickToUnit(controller->axisRY()), gain};
 }
 
 void GamepadInput::logInput() {
-  if (!connected()) {
-    return;
-  }
   LOG("lx %d ry %d dpad %02x buttons %04x battery %u", controller->axisX(), controller->axisRY(), controller->dpad(),
       controller->buttons(), controller->battery());
 }

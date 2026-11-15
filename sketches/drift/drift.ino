@@ -9,6 +9,7 @@
 
 #include "./config.h"
 #include "./gamepad_input.h"
+#include "./log.h"
 #include "./receiver_input.h"
 
 const uint32_t BLINK_SLOT_MS = 1000;
@@ -132,16 +133,16 @@ void setup() {
   }
 
   input.begin();
-  LOG("gain %.1f\n", input.command().gain);
+  LOG("gain %.1f\n", DRIFT_GAIN);
 }
 
 void loop() {
   const bool fresh = input.update();
   const bool connected = input.connected();
-  if (!connected && (status & STATUS_CONTROLLER)) {
+  setStatus(STATUS_CONTROLLER, connected);
+  if (!connected) {
     stop();
   }
-  setStatus(STATUS_CONTROLLER, connected);
   if (fresh) {
     drive(input.command());
   }

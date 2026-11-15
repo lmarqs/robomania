@@ -11,12 +11,13 @@ struct DriveCommand {
 class DriveInput {
  public:
   virtual void begin() = 0;
-  /** Takes what the controller sent; returns true when a new command is ready. */
+  /** Takes what the controller sent; returns true when a new command is ready, which needs a connected controller. */
   virtual bool update() = 0;
   /** Whether a controller is connected and sending. */
   virtual bool connected() = 0;
-  /** The latest command; steering and throttle are 0 until the first one arrives. */
+  /** The latest command; only after update() returned true. */
   virtual DriveCommand command() = 0;
-  /** Writes the raw input behind the latest command to the serial port, for the log's input line. */
+  /** Writes the raw input behind the latest command to the serial port, for the log's input line; only after update()
+   * returned true. */
   virtual void logInput() = 0;
 };
