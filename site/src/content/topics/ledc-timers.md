@@ -13,7 +13,7 @@ other work. Each signal comes from a **channel**, and each channel counts on a *
 and the resolution.
 
 The catch: the Arduino core drives channels in pairs, 2k and 2k + 1, from one timer, so both channels of a pair must
-run at the same frequency and resolution. The project's `EspLedcOutPin` driver handles this when it starts: it picks
+run at the same frequency and resolution. The project's `EspPwmOutPin` driver handles this when it starts: it picks
 a channel whose pair is free, or already runs at the same frequency and resolution, counting up from channel 0.
 
 That is why the omnidirectional robot's four motors, all at 5 kHz and 12 bits, fit neatly into pairs, while the

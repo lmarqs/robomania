@@ -14,7 +14,7 @@ layout, and the Done check in [AGENTS.md](../../AGENTS.md) enforces it.
 - A `lib/` header MUST NOT share its name with a header of the core or of a library a sketch uses. `lib/` is on the
   include path, so its header takes the other's place: the camera driver's files became `camera*` so that none
   would shadow `<esp_camera.h>`.
-- A file in `lib/` that builds only on ESP32 MUST be wrapped in `#ifdef ESP32`, as `lib/ledc_pin.h` is. `lib/` also
+- A file in `lib/` that builds only on ESP32 MUST be wrapped in `#ifdef ESP32`, as `lib/pwm_out_pin.h` is. `lib/` also
   builds for other boards, and arduino-cli compiles every source of a library a sketch lists, so one unguarded
   ESP32-only file breaks the build for every other board.
 - A sketch that uses the serial port MUST open it at 115200 baud: `output.begin("<key>")` from `lib/serial_io.h` does,

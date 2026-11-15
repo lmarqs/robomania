@@ -3,26 +3,26 @@
 #include <Arduino.h>
 #include <digital_pin.h>
 #include <h_bridge.h>
-#include <ledc_pin.h>
+#include <pwm_out_pin.h>
 
 #include "wheel_mixer.h"
 
-EspLedcOutPin pwm1(15, 5000, 12);
+EspPwmOutPin pwm1(15, 5000, 12);
 DigitalOutPin in11(04);
 DigitalOutPin in21(16);
 FullHBridge motor1(&pwm1, &in11, &in21);
 
-EspLedcOutPin pwm2(18, 5000, 12);
+EspPwmOutPin pwm2(18, 5000, 12);
 DigitalOutPin in12(05);
 DigitalOutPin in22(17);
 FullHBridge motor2(&pwm2, &in12, &in22);
 
-EspLedcOutPin pwm3(25, 5000, 12);
+EspPwmOutPin pwm3(25, 5000, 12);
 DigitalOutPin in13(27);
 DigitalOutPin in23(26);
 FullHBridge motor3(&pwm3, &in13, &in23);
 
-EspLedcOutPin pwm4(13, 5000, 12);
+EspPwmOutPin pwm4(13, 5000, 12);
 DigitalOutPin in14(14);
 DigitalOutPin in24(12);
 FullHBridge motor4(&pwm4, &in14, &in24);

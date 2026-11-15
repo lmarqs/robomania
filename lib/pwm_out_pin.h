@@ -10,7 +10,7 @@
  * same frequency and resolution, counting up from channel 0. analogWrite() takes its channels from the top down
  * without telling this allocator, so the two meet only when the channels run out.
  */
-class EspLedcOutPin : public PwmOutPin {
+class EspPwmOutPin : public PwmOutPin {
  private:
   uint8_t pin;
   int8_t channel = -1;
@@ -19,7 +19,7 @@ class EspLedcOutPin : public PwmOutPin {
   uint8_t resolution;
 
  public:
-  EspLedcOutPin(uint8_t pin, uint32_t frequency, uint8_t resolution);
+  EspPwmOutPin(uint8_t pin, uint32_t frequency, uint8_t resolution);
   bool begin();
   void write(uint16_t duty);
   uint32_t frequency();

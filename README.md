@@ -93,15 +93,17 @@ The drivers in `lib/`:
 
 | Files | Drives |
 | --- | --- |
-| `pin.h`, `digital_pin.*`, `analog_pin.*` | GPIO pins through the Arduino API |
+| `pin.h` | The pin interfaces, free of the Arduino core: a level in or out, a PWM duty out, a pulse width in |
+| `digital_pin.*`, `analog_pin.*` | GPIO pins through the Arduino API |
 | `board_led.*` | The LED on the board the sketch is built for |
 | `line_reader.*` | Serial bytes split into lines |
 | `serial_io.*` | The serial port as lines: read without waiting, printed with `Print` |
-| `ledc_pin.*` | A PWM pin through the ESP32 LEDC peripheral, on a channel it allocates |
+| `pwm_out_pin.*` | A PWM output through the ESP32 LEDC peripheral, on a channel it allocates |
 | `h_bridge.*` | A motor through a full or half H-bridge |
 | `pulse_in_pin.*` | The width of the pulses a pin receives, such as an RC receiver channel's, timed by interrupt on an ESP32 |
 | `rc_channel.*` | An RC receiver channel's pulse width as a stick position or a knob level |
-| `pulse_width.*` | A pulse width as a PWM duty, and a position as a pulse between low, centre and high |
+| `pulse_width.*` | A pulse width as a PWM duty, and a position from -1 to 1 as a pulse between low, centre and high, and back |
+| `pulse_out.*` | A servo-style pulse on a PWM pin, set by a position from -1 to 1, that the ESC and servo drivers share |
 | `servo.*` | A positional (180°) or continuous-rotation (360°) hobby servo on a PWM pin |
 | `esc.*` | A motor through its electronic speed controller on a PWM pin: a forward-only brushless one, or an RC car's that also reverses |
 | `imu.*` | An MPU6050 accelerometer and gyroscope on I2C |

@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <esc.h>
 #include <imu.h>
-#include <ledc_pin.h>
+#include <pwm_out_pin.h>
 #include <serial_io.h>
 
 #include "./balancer.h"
@@ -22,8 +22,8 @@ const uint32_t ESC_ARM_MS = 3000;
 const UBaseType_t CONTROL_PRIORITY = 10;
 const uint32_t CONTROL_STACK_BYTES = 8192;
 
-static EspLedcOutPin escPin1(ESC_1_PIN, ESC_HZ, ESC_RESOLUTION);
-static EspLedcOutPin escPin2(ESC_2_PIN, ESC_HZ, ESC_RESOLUTION);
+static EspPwmOutPin escPin1(ESC_1_PIN, ESC_HZ, ESC_RESOLUTION);
+static EspPwmOutPin escPin2(ESC_2_PIN, ESC_HZ, ESC_RESOLUTION);
 static Esc esc1(&escPin1);
 static Esc esc2(&escPin2);
 static Mpu6050Imu imu(&Wire);

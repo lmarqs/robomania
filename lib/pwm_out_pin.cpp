@@ -1,5 +1,5 @@
 #ifdef ESP32
-#include "ledc_pin.h"
+#include "pwm_out_pin.h"
 
 #include <Arduino.h>
 #include <esp32-hal-ledc.h>
@@ -76,13 +76,13 @@ void ledcReleaseTimer(int8_t timer) {
   }
 }
 
-EspLedcOutPin::EspLedcOutPin(uint8_t pin, uint32_t frequency, uint8_t resolution) {
+EspPwmOutPin::EspPwmOutPin(uint8_t pin, uint32_t frequency, uint8_t resolution) {
   this->pin = pin;
   this->requestedFrequency = frequency;
   this->resolution = resolution;
 }
 
-bool EspLedcOutPin::begin() {
+bool EspPwmOutPin::begin() {
   if (channel >= 0) {
     return true;
   }
@@ -109,7 +109,7 @@ bool EspLedcOutPin::begin() {
   return true;
 }
 
-void EspLedcOutPin::write(uint16_t duty) {
+void EspPwmOutPin::write(uint16_t duty) {
   if (channel < 0) {
     return;
   }
@@ -117,5 +117,5 @@ void EspLedcOutPin::write(uint16_t duty) {
   ledcWrite(channel, ((uint64_t)duty << resolution) / DUTY_MAX);
 }
 
-uint32_t EspLedcOutPin::frequency() { return actualFrequency; }
+uint32_t EspPwmOutPin::frequency() { return actualFrequency; }
 #endif

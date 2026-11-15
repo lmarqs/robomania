@@ -1,9 +1,9 @@
 #include <Arduino.h>
-#include <ledc_pin.h>
+#include <pwm_out_pin.h>
 #include <serial_io.h>
 #include <servo.h>
 
-EspLedcOutPin servoPin(13, 50, 16);
+EspPwmOutPin servoPin(13, 50, 16);
 PositionalServo servo(&servoPin);
 SerialOutput output;
 

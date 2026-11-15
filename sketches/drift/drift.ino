@@ -3,8 +3,8 @@
 #include <board_led.h>
 #include <esc.h>
 #include <imu.h>
-#include <ledc_pin.h>
 #include <pulse_out.h>
+#include <pwm_out_pin.h>
 #include <steering_assist.h>
 
 #include "./config.h"
@@ -21,8 +21,8 @@ const uint8_t STATUS_IMU = 1 << 1;
 const uint8_t STATUS_ALL = STATUS_CONTROLLER | STATUS_IMU;
 
 // The servo and the ESC share one 50 Hz LEDC timer; 16 bits make a step of 0.3 µs at that rate.
-static EspLedcOutPin steeringPin(STEERING_PIN, 50, 16);
-static EspLedcOutPin escPin(ESC_PIN, 50, 16);
+static EspPwmOutPin steeringPin(STEERING_PIN, 50, 16);
+static EspPwmOutPin escPin(ESC_PIN, 50, 16);
 static PulseOut steering(&steeringPin,
                          PulseRange(DRIFT_STEERING_LEFT_US, DRIFT_STEERING_CENTER_US, DRIFT_STEERING_RIGHT_US));
 static ReversibleEsc esc(&escPin);

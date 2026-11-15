@@ -6,7 +6,7 @@
 
 #define CAMERA_MODEL_AI_THINKER
 #include "camera_pins.h"
-#include "ledc_pin.h"
+#include "pwm_out_pin.h"
 
 bool EspCamera::begin() {
   if (esp_camera_sensor_get()) {

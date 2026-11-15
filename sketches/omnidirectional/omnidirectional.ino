@@ -3,8 +3,8 @@
 #include <Wire.h>
 #include <digital_pin.h>
 #include <h_bridge.h>
-#include <ledc_pin.h>
 #include <pin.h>
+#include <pwm_out_pin.h>
 
 #include "./car.h"
 #include "./drive_command.h"
