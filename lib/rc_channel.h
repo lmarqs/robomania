@@ -1,0 +1,23 @@
+#pragma once
+
+#include <stdint.h>
+
+/**
+ * One channel of an RC receiver: the servo pulse width it sends, mapped to where the transmitter's stick, trigger or
+ * knob stands. `lowUs`, `centerUs` and `highUs` are the pulses at one end, the middle and the other end; `lowUs` above
+ * `highUs` reverses the channel.
+ */
+class RcChannel {
+ private:
+  int32_t lowUs, centerUs, highUs, deadZoneUs;
+
+ public:
+  /** A pulse within `deadZoneUs` of `centerUs` reads as the centre, so a stick that rests a little off still stops. */
+  RcChannel(uint32_t lowUs, uint32_t centerUs, uint32_t highUs, uint32_t deadZoneUs);
+
+  /** From -1 at `lowUs` through 0 at `centerUs` to 1 at `highUs`, each side scaled on its own and clamped. */
+  float position(uint32_t pulseUs) const;
+
+  /** From 0 at `lowUs` to 1 at `highUs`, clamped, for a knob or switch that sets a value rather than a direction. */
+  float level(uint32_t pulseUs) const;
+};
