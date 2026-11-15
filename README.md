@@ -99,10 +99,11 @@ The drivers in `lib/`:
 | `ledc_pin.*` | A PWM pin through the ESP32 LEDC peripheral, on a channel it allocates |
 | `h_bridge.*` | A motor through a full or half H-bridge |
 | `servo.*` | A positional (180°) or continuous-rotation (360°) hobby servo on a PWM pin |
-| `esc.*` | A brushless motor through its electronic speed controller, on a PWM pin |
+| `esc.*` | A motor through its electronic speed controller on a PWM pin: a forward-only brushless one, or an RC car's that also reverses |
 | `imu.*` | An MPU6050 accelerometer and gyroscope on I2C |
 | `complementary_filter.*` | One steady angle out of an accelerometer's and a gyroscope's readings |
 | `pid_controller.*` | A PID controller |
+| `steering_assist.*` | Counter-steer against a car's yaw rate, as an RC drift gyro adds |
 | `camera*` | The camera of an AI Thinker ESP32-CAM |
 | `web_server.*` | An HTTP and WebSocket server on the ESP-IDF `httpd` |
 
