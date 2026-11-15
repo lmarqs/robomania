@@ -1,9 +1,8 @@
 #include "esc.h"
 
-Esc::Esc(PwmOutPin* pwm, uint32_t minPulseUs, uint32_t maxPulseUs) {
+// The minimum pulse sits at both the low end and the centre of the range, so throttles 0 to 1 span it.
+Esc::Esc(PwmOutPin* pwm, uint32_t minPulseUs, uint32_t maxPulseUs) : range(minPulseUs, minPulseUs, maxPulseUs) {
   this->pwm = pwm;
-  this->minPulseUs = minPulseUs;
-  this->maxPulseUs = maxPulseUs;
 }
 
 bool Esc::begin() {
@@ -12,29 +11,19 @@ bool Esc::begin() {
   return ready;
 }
 
-float Esc::pulseUs(float throttle) const {
-  throttle = constrain(throttle, 0.0f, 1.0f);
-  return minPulseUs + throttle * (maxPulseUs - minPulseUs);
-}
-
-static void writePulse(PwmOutPin* pwm, float pulseUs) {
-  float duty = pulseUs * pwm->frequency() / 1000000.0f * PwmOutPin::DUTY_MAX;
-  pwm->write((uint16_t)min(duty + 0.5f, (float)PwmOutPin::DUTY_MAX));
-}
+float Esc::pulseUs(float throttle) const { return range.pulseUs(constrain(throttle, 0.0f, 1.0f)); }
 
 void Esc::write(float throttle) {
   if (!ready) {
     return;
   }
 
-  writePulse(pwm, pulseUs(throttle));
+  pwm->write(pulseDuty(pulseUs(throttle), pwm->frequency()));
 }
 
-ReversibleEsc::ReversibleEsc(PwmOutPin* pwm, uint32_t minPulseUs, uint32_t neutralPulseUs, uint32_t maxPulseUs) {
+ReversibleEsc::ReversibleEsc(PwmOutPin* pwm, uint32_t minPulseUs, uint32_t neutralPulseUs, uint32_t maxPulseUs)
+    : range(minPulseUs, neutralPulseUs, maxPulseUs) {
   this->pwm = pwm;
-  this->minPulseUs = minPulseUs;
-  this->neutralPulseUs = neutralPulseUs;
-  this->maxPulseUs = maxPulseUs;
 }
 
 bool ReversibleEsc::begin() {
@@ -43,18 +32,12 @@ bool ReversibleEsc::begin() {
   return ready;
 }
 
-float ReversibleEsc::pulseUs(float throttle) const {
-  throttle = constrain(throttle, -1.0f, 1.0f);
-  if (throttle >= 0.0f) {
-    return neutralPulseUs + throttle * (maxPulseUs - neutralPulseUs);
-  }
-  return neutralPulseUs + throttle * (neutralPulseUs - minPulseUs);
-}
+float ReversibleEsc::pulseUs(float throttle) const { return range.pulseUs(throttle); }
 
 void ReversibleEsc::write(float throttle) {
   if (!ready) {
     return;
   }
 
-  writePulse(pwm, pulseUs(throttle));
+  pwm->write(pulseDuty(pulseUs(throttle), pwm->frequency()));
 }

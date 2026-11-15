@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 #include "pin.h"
+#include "pulse_width.h"
 
 /**
  * An electronic speed controller for a brushless motor, driven by pulse width on a PWM pin, such as an
@@ -12,7 +13,7 @@
 class Esc {
  private:
   PwmOutPin* pwm;
-  uint32_t minPulseUs, maxPulseUs;
+  PulseRange range;
   bool ready = false;
 
  public:
@@ -39,7 +40,7 @@ class Esc {
 class ReversibleEsc {
  private:
   PwmOutPin* pwm;
-  uint32_t minPulseUs, neutralPulseUs, maxPulseUs;
+  PulseRange range;
   bool ready = false;
 
  public:
