@@ -12,8 +12,9 @@
 uint16_t pulseDuty(float pulseUs, uint32_t frequencyHz);
 
 /**
- * The pulses at one end, the middle and the other end of a servo's or ESC's travel. `lowUs` above `highUs` reverses
- * the travel.
+ * The pulses at one end, the middle and the other end of a servo's or ESC's travel, or of an RC receiver channel's
+ * stick. It converts both ways: pulseUs() gives the pulse to send for a position, and position() reads a received
+ * pulse back as one. `lowUs` above `highUs` reverses the travel.
  */
 class PulseRange {
  private:
@@ -27,4 +28,10 @@ class PulseRange {
    * scaled on its own. A position past either end is clamped to it, and a NaN one gives `centerUs`.
    */
   float pulseUs(float position) const;
+
+  /**
+   * The position, from -1 at `lowUs` through 0 at `centerUs` to 1 at `highUs`, that `pulseUs` stands for: the inverse
+   * of pulseUs(). A pulse past either end is clamped to it, and a NaN one gives 0.
+   */
+  float position(float pulseUs) const;
 };

@@ -24,3 +24,17 @@ float PulseRange::pulseUs(float position) const {
   }
   return centerUs + position * (centerUs - lowUs);
 }
+
+float PulseRange::position(float pulseUs) const {
+  const float offset = pulseUs - centerUs;
+  if (offset != offset || offset == 0.0f) {
+    return 0.0f;
+  }
+  const bool towardHigh = (offset > 0.0f) == (highUs > centerUs);
+  const float span = towardHigh ? highUs - centerUs : centerUs - lowUs;
+  // A one-way range has no span on one side of its centre; any pulse there is past that end.
+  if (span == 0.0f) {
+    return towardHigh ? 1.0f : -1.0f;
+  }
+  return clamp(offset / span, -1.0f, 1.0f);
+}

@@ -2,14 +2,18 @@
 
 #include <stdint.h>
 
+#include "pulse_width.h"
+
 /**
  * One channel of an RC receiver: the servo pulse width it sends, mapped to where the transmitter's stick, trigger or
  * knob stands. `lowUs`, `centerUs` and `highUs` are the pulses at one end, the middle and the other end; `lowUs` above
- * `highUs` reverses the channel.
+ * `highUs` reverses the channel. It reads pulses through the same PulseRange that PulseOut sends them with, plus a dead
+ * zone around the centre.
  */
 class RcChannel {
  private:
-  int32_t lowUs, centerUs, highUs, deadZoneUs;
+  PulseRange stick, travel;
+  float centerUs, deadZoneUs;
 
  public:
   /** Whether `widthUs` is a servo pulse, 500 to 2500 µs; a receiver sends nothing else, so any other width is noise. */
