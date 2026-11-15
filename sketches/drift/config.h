@@ -7,27 +7,23 @@
 #endif
 
 // ESP32 WROOM-32 GPIO numbers. GPIO12 straps the flash voltage: held high at reset, it selects 1.8 V and the board
-// fails to boot. A servo's signal input does not pull it high, so the steering can sit there.
+// fails to boot, which a sensor board's pull-up on SDA does.
 #ifndef DRIFT_ESC_PIN
-#define DRIFT_ESC_PIN 13
+#define DRIFT_ESC_PIN 21
 #endif
 #ifndef DRIFT_STEERING_PIN
-#define DRIFT_STEERING_PIN 12
+#define DRIFT_STEERING_PIN 23
 #endif
 #ifndef DRIFT_I2C_SDA_PIN
-#define DRIFT_I2C_SDA_PIN 21
+#define DRIFT_I2C_SDA_PIN 12
 #endif
 #ifndef DRIFT_I2C_SCL_PIN
-#define DRIFT_I2C_SCL_PIN 22
-#endif
-#ifndef DRIFT_LED_PIN
-#define DRIFT_LED_PIN 2
+#define DRIFT_I2C_SCL_PIN 13
 #endif
 const uint8_t ESC_PIN = DRIFT_ESC_PIN;
 const uint8_t STEERING_PIN = DRIFT_STEERING_PIN;
 const uint8_t I2C_SDA_PIN = DRIFT_I2C_SDA_PIN;
 const uint8_t I2C_SCL_PIN = DRIFT_I2C_SCL_PIN;
-const uint8_t LED_PIN = DRIFT_LED_PIN;
 
 // The servo's pulses at full left, centre and full right. A car's steering stops short of the servo's own travel, so
 // these come from the car: too wide a range stalls the servo against the stops.
