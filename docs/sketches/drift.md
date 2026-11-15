@@ -10,6 +10,8 @@ pulses, from a Bluetooth gamepad. An MPU6050 measures how fast the car spins, an
 against that spin, as an RC drift gyro does: when the tail swings out, the wheels turn into the slide, which damps the
 spin so the car holds the drift. The gyro acts on the steering only; the throttle stays with the driver.
 
+![The drift car's FreeRTOS tasks on each core, the peripherals they drive and the pins they use](drift-architecture.svg)
+
 ## Wiring
 
 | GPIO | To | Setting |
