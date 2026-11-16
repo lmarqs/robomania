@@ -48,10 +48,10 @@ void test_positional_servo_holds_its_last_pulse_on_a_nan_angle(void) {
   FakePwmOutPin pin;
   PositionalServo servo(&pin);
   servo.begin();
-  servo.write(90.0f);
+  servo.write(0.0f);
   int writes = pin.writes;
   servo.write(NAN);
-  TEST_ASSERT_EQUAL(4823, pin.duty);
+  TEST_ASSERT_EQUAL(1783, pin.duty);
   TEST_ASSERT_EQUAL(writes, pin.writes);
 }
 

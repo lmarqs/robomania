@@ -48,7 +48,7 @@ website: Astro 7 in `site/package.json`, Node 24 in `mise.toml`, pnpm 12 in `mis
 - Edit generated files by hand: `<sketch>/data/*.h`
 - Make a check pass by weakening it: skipping a test, suppressing a warning, loosening an assertion.
 
-**Stop and ask** before destroying state (uncommitted work, secrets), and when a check fails again after a
+**Stop and ask** before destroying state such as uncommitted work or secrets, and when a check fails again after a
 fix, a command is refused, or a decision is open.
 
 Enforced by `.agents/permission/policy.yaml`. A refusal is the rule working.
@@ -71,7 +71,7 @@ Enforced by `.agents/permission/policy.yaml`. A refusal is the rule working.
 
 ## Rules
 
-- Sketches have no tests: report how a behavior change was checked: the Done check or a run on the board.
+- Sketches have no tests: report how the Done check or a board run verified a behavior change.
 - Follow the standards: [C++ and Python](docs/standards/README.md), website [UX](docs/standards/website-ux.md),
   [sources](docs/standards/website-sources.md).
 - Change only what the task needs, matching the surrounding code.

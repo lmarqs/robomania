@@ -10,7 +10,9 @@ bool PositionalServo::begin() { return out.begin(); }
 static float positionOf(float angleDeg, float rangeDeg) { return 2.0f * angleDeg / rangeDeg - 1.0f; }
 
 void PositionalServo::write(float angleDeg) {
-  if (isnan(angleDeg)) return;
+  if (isnan(angleDeg)) {
+    return;
+  }
   out.write(positionOf(angleDeg, rangeDeg));
 }
 
