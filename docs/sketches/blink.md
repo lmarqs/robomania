@@ -12,7 +12,7 @@ board that runs each step's code.
 All four steps:
 
 - Drive the LED on GPIO 2.
-- Open the serial port with `output.begin("blink/<step>")` from `lib/serial_io.h`, which sets 115200 baud and prints
+- Open the serial port with `output.begin("blink/<step>")` from `lib/serial_output.h`, which sets 115200 baud and prints
   a blank line and `sketch blink/<step>`. The website reads that line to tell which step a connected board runs.
 - Print `HIGH` or `LOW` as the LED changes.
 

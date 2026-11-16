@@ -24,17 +24,18 @@ to ground through the switches, called shoot-through, and it destroys them.
 
 ## In the project's code
 
-Real H-bridges come as driver chips with transistors for switches. The project's `FullHBridge` driver uses three pins
-for each motor: two direction pins and one PWM pin for speed.
+Real H-bridges come as driver chips with transistors for switches. The project's `FullHBridgeMotor` driver uses three
+pins for each motor: two direction pins and one PWM pin for speed. Like every motor in the library, it takes a
+throttle from -1, full reverse, to 1, full forward.
 
 | | IN1 | IN2 | PWM |
 | --- | --- | --- | --- |
-| `forward(value)` | high | low | `value` |
-| `backward(value)` | low | high | `value` |
-| `stop()` | low | low | 0 |
+| `write(throttle)`, throttle above 0 | high | low | the throttle's share of full duty |
+| `write(throttle)`, throttle below 0 | low | high | the throttle's share of full duty, without its sign |
+| `write(0)` | low | low | 0 |
 
 What both direction pins low does, brake or coast, depends on the chip; its datasheet says. The driver's header is
-on the [Library](../../library/#h_bridge.h) page.
+on the [Library](../../library/#full_h_bridge_motor.h) page.
 
 <div class="gap">
 

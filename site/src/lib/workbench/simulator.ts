@@ -70,7 +70,7 @@ export interface OutputLine {
 /**
  * Something that happened on the board. `sent`: the visitor queued a line. `read`: the program took a queued line, at
  * the operation that reads serial input. `print`: the program printed a line. `write`: the program set an output pin,
- * at the line that writes it, such as `led.write(HIGH);`. `turn`: the program sent a servo on an output pin to an
+ * at the line that writes it, such as `led.write(true);`. `turn`: the program sent a servo on an output pin to an
  * angle in degrees, at the line that writes it, such as `servo.write(angle);`.
  */
 export type Effect =

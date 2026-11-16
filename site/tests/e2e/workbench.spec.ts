@@ -376,11 +376,11 @@ test.describe('the Blink workbench', () => {
       { line: at('led.begin();') },
       { line: at('if (input.ready()) {') },
       { line: at('output.println("HIGH");'), prints: 'HIGH' },
-      { line: at('led.write(HIGH);'), watch: { LED: 'HIGH' } },
+      { line: at('led.write(true);'), watch: { LED: 'HIGH' } },
       // Step runs a whole delay at once, with no real wait.
       { line: at('delay(blinkDelay);') },
       { line: at('output.println("LOW");'), prints: 'LOW' },
-      { line: at('led.write(LOW);'), watch: { LED: 'LOW', measured: '1000 ms' } },
+      { line: at('led.write(false);'), watch: { LED: 'LOW', measured: '1000 ms' } },
       { line: at('delay(blinkDelay);', 2) },
     ];
     const output: string[] = [];
@@ -444,7 +444,7 @@ test.describe('the Blink workbench', () => {
     await freeze(page);
     await button(page, 'Restart').click();
     await expect(led).not.toHaveAttribute('data-changed');
-    // led.write(HIGH) runs at 2000 ms in slow mode.
+    // led.write(true) runs at 2000 ms in slow mode.
     await page.clock.runFor(2050);
     await expect(led).toHaveText('HIGH');
     await expect(led).toHaveAttribute('data-changed');
@@ -709,7 +709,7 @@ test.describe('the Blink workbench', () => {
     });
   }
 
-  test('traces GPIO 2 over the last 10 s: low at the start, high once led.write(HIGH) runs, scrolling left', async ({
+  test('traces GPIO 2 over the last 10 s: low at the start, high once led.write(true) runs, scrolling left', async ({
     page,
   }) => {
     await expect(bench(page).locator('.scope figcaption')).toHaveText(/GPIO 2, last 10 s\s*you sent\s*board applied/);
@@ -720,7 +720,7 @@ test.describe('the Blink workbench', () => {
     await nextFrame(page);
     expect(await levelPath(page)).toEqual({ now: LOW_Y, rise: undefined });
 
-    // led.write(HIGH) runs at 2000 ms in slow mode; the delay after it then fills for 1000 ms.
+    // led.write(true) runs at 2000 ms in slow mode; the delay after it then fills for 1000 ms.
     await page.clock.runFor(2050);
     await expect(watchValue(page, 'LED')).toHaveText('HIGH');
     const width = (await trace(page).boundingBox())!.width;

@@ -12,12 +12,14 @@ The ESP32's LEDC peripheral generates PWM signals in hardware: once set up, a si
 other work. Each signal comes from a **channel**, and each channel counts on a **timer**, which sets the frequency
 and the resolution.
 
-The catch: the Arduino core drives channels in pairs, 2k and 2k + 1, from one timer, so both channels of a pair must
-run at the same frequency and resolution. The project's `EspPwmOutPin` driver handles this when it starts: it picks
-a channel whose pair is free, or already runs at the same frequency and resolution, counting up from channel 0.
+The catch, in version 2 of the Arduino core for the ESP32: it drives channels in pairs, 2k and 2k + 1, from one timer,
+so both channels of a pair must run at the same frequency and resolution. The project's `BoardPwmOutPin` driver
+handles this when it starts: it picks a channel whose pair is free, or already runs at the same frequency and
+resolution, counting up from channel 0. Version 3 of the core picks the channel and the timer itself, so there the
+driver leaves it to the core.
 
 That is why the omnidirectional robot's four motors, all at 5 kHz and 12 bits, fit neatly into pairs, while the
-camera, whose clock needs a timer of its own, reserves a whole timer with `ledcReserveTimer()`.
+camera, whose clock needs a timer of its own, reserves a whole timer with `esp32LedcReserveTimer()`.
 
 <div class="gap">
 

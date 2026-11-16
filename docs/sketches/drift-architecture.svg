@@ -119,15 +119,15 @@
 
     <circle class="step" cx="896" cy="354" r="11"/><text class="steptext" x="892" y="358">3</text>
     <text class="mono" x="916" y="351">esc.write((R2 − L2)/1023 × THROTTLE_MAX)</text>
-    <text class="sm" x="916" y="367">ReversibleEsc: −1…1 → 1000…1500…2000 µs</text>
+    <text class="sm" x="916" y="367">ReversibleEscMotor: −1…1 → 1000…1500…2000 µs</text>
 
     <circle class="step" cx="896" cy="398" r="11"/><text class="steptext" x="892" y="402">4</text>
-    <text class="mono" x="916" y="395">imu.read() → gz (yaw rate, °/s)</text>
+    <text class="mono" x="916" y="395">imu.read() → gzDps (yaw rate, °/s)</text>
     <text class="sm" x="916" y="411">blocking I2C read, 14 bytes, fails after 10 ms</text>
 
     <circle class="step" cx="896" cy="442" r="11"/><text class="steptext" x="892" y="446">5</text>
-    <text class="mono" x="916" y="439">assist.steer(stick, gz, gain)</text>
-    <text class="sm" x="916" y="455">stick − gain × gz / 200 °/s, clamped to ±1</text>
+    <text class="mono" x="916" y="439">assist.steer(stick, gzDps, gain)</text>
+    <text class="sm" x="916" y="455">stick − gain × gzDps / 200 °/s, clamped to ±1</text>
 
     <circle class="step" cx="896" cy="486" r="11"/><text class="steptext" x="892" y="490">6</text>
     <text class="mono" x="916" y="483">steering.write(steer)</text>
@@ -183,7 +183,7 @@
   <text class="sm" x="848" y="830">Serial.printf from ArduinoTask</text>
 
   <rect class="hw" x="1110" y="716" width="250" height="140" rx="12"/>
-  <text class="t3" x="1128" y="740">GPIO — BoardLed</text>
+  <text class="t3" x="1128" y="740">GPIO — BOARD_LED_PIN</text>
   <text class="tx" x="1128" y="766">steady: gamepad + IMU ok</text>
   <text class="tx" x="1128" y="786">short blink: IMU not ok</text>
   <text class="tx" x="1128" y="806">long blink: no gamepad</text>

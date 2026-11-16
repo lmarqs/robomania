@@ -14,7 +14,7 @@ width says the angle.
 
 The project's `PositionalServo` maps 0° to a 544 µs pulse and 180° to 2400 µs by default. A **continuous-rotation**
 servo looks the same but reads the pulse width as speed and direction instead of angle; the project drives it with
-`ContinuousServo`, where the middle pulse stops it.
+`ContinuousServoMotor`, where the middle pulse stops it.
 
 The [Servo project](../../projects/servo/) lets you drag the angle and watch the pulse.
 

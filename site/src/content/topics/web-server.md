@@ -9,7 +9,7 @@ order: 3
 ---
 
 The project's library has a web server driver built on ESP-IDF's `httpd`, with WebSocket support; its header is on
-the [Library](../../library/#web_server.h) page.
+the [Library](../../library/#esp32_web_server.h) page.
 
 <div class="gap">
 
