@@ -20,9 +20,11 @@ void ARDUINO_ISR_ATTR BoardPulseInPin::onEdge(void* self) {
 }
 
 uint32_t BoardPulseInPin::read(uint32_t maxAgeUs) {
+  const uint32_t nowUs = micros();
   portENTER_CRITICAL(&lock);
+  meter.forgetExpired(nowUs, maxAgeUs);
   const PulseWidthMeter snapshot = meter;
   portEXIT_CRITICAL(&lock);
-  return snapshot.widthUs(micros(), maxAgeUs);
+  return snapshot.widthUs(nowUs, maxAgeUs);
 }
 #endif

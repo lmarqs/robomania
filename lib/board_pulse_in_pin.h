@@ -13,6 +13,9 @@
  * - ESP8266: on any GPIO but GPIO16, which has no interrupt, or the flash chip's pins.
  * - AVR: on the first two external interrupts' pins, 2 and 3 on an Uno or Nano. micros() counts in 4 µs steps
  *   there, so a width is read to 4 µs.
+ *
+ * read() measures a pulse's age on the wrapping 32-bit micros(): a caller must read at least once every 71 minutes
+ * for the age to hold across the wrap.
  */
 class BoardPulseInPin : public PulseInPin {
  private:

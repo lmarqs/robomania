@@ -25,9 +25,11 @@ void BoardPulseInPin::onEdge(void* self) {
 }
 
 uint32_t BoardPulseInPin::read(uint32_t maxAgeUs) {
+  const uint32_t nowUs = micros();
   noInterrupts();
+  meter.forgetExpired(nowUs, maxAgeUs);
   const PulseWidthMeter snapshot = meter;
   interrupts();
-  return snapshot.widthUs(micros(), maxAgeUs);
+  return snapshot.widthUs(nowUs, maxAgeUs);
 }
 #endif

@@ -5,7 +5,8 @@
 /**
  * Measures high pulses from the edges a pin interrupt reports, on any board: the logic BoardPulseInPin runs in its
  * interrupt handler. Its methods are always inlined, so a handler that must run from RAM, as on the ESP8266, never
- * calls into flash. The caller guards a copy against the handler, as BoardPulseInPin does.
+ * calls into flash. The caller guards a copy against the handler, as BoardPulseInPin does. A pulse that
+ * forgetExpired() has found expired stays forgotten, however far the clock later wraps.
  */
 class PulseWidthMeter {
  private:
@@ -28,6 +29,13 @@ class PulseWidthMeter {
     }
     this->high = high;
     lastEdgeUs = nowUs;
+  }
+
+  /** Forgets the last pulse if it ended more than `maxAgeUs` before `nowUs`, so widthUs() reads 0 from then on. */
+  __attribute__((always_inline)) inline void forgetExpired(uint32_t nowUs, uint32_t maxAgeUs) {
+    if (hasPulse && nowUs - lastEndUs > maxAgeUs) {
+      hasPulse = false;
+    }
   }
 
   /** The width, in microseconds, of the last pulse if it ended within `maxAgeUs` of `nowUs`; otherwise 0. */
