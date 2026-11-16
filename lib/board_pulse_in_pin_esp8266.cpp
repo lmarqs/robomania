@@ -5,7 +5,8 @@
 static const uint8_t LAST_INTERRUPT_PIN = 15;
 
 bool BoardPulseInPin::begin() {
-  if (pin > LAST_INTERRUPT_PIN) {
+  // Making a flash pin an input cuts the chip off from the flash it runs from.
+  if (pin > LAST_INTERRUPT_PIN || isFlashInterfacePin(pin)) {
     return false;
   }
   pinMode(pin, INPUT);

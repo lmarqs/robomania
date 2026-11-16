@@ -10,7 +10,7 @@
  * for a pulse:
  *
  * - ESP32: on any GPIO, pulled down, so a loose wire gives no pulses instead of noise.
- * - ESP8266: on any GPIO but GPIO16, which has no interrupt.
+ * - ESP8266: on any GPIO but GPIO16, which has no interrupt, or the flash chip's pins.
  * - AVR: on the first two external interrupts' pins, 2 and 3 on an Uno or Nano. micros() counts in 4 µs steps
  *   there, so a width is read to 4 µs.
  */
