@@ -1,9 +1,7 @@
 #ifdef ESP32
-#include "pulse_in_pin.h"
+#include "board_pulse_in_pin.h"
 
-EspPulseInPin::EspPulseInPin(uint8_t pin) { this->pin = pin; }
-
-bool EspPulseInPin::begin() {
+bool BoardPulseInPin::begin() {
   if (digitalPinToInterrupt(pin) == NOT_AN_INTERRUPT) {
     return false;
   }
@@ -12,8 +10,8 @@ bool EspPulseInPin::begin() {
   return true;
 }
 
-void ARDUINO_ISR_ATTR EspPulseInPin::onEdge(void* self) {
-  EspPulseInPin* input = (EspPulseInPin*)self;
+void ARDUINO_ISR_ATTR BoardPulseInPin::onEdge(void* self) {
+  BoardPulseInPin* input = (BoardPulseInPin*)self;
   const uint32_t nowUs = micros();
   const bool high = digitalRead(input->pin) == HIGH;
   portENTER_CRITICAL_ISR(&input->lock);
@@ -27,7 +25,7 @@ void ARDUINO_ISR_ATTR EspPulseInPin::onEdge(void* self) {
   portEXIT_CRITICAL_ISR(&input->lock);
 }
 
-uint32_t EspPulseInPin::read(uint32_t maxAgeUs) {
+uint32_t BoardPulseInPin::read(uint32_t maxAgeUs) {
   portENTER_CRITICAL(&lock);
   const uint32_t width = widthUs;
   const uint32_t end = endUs;

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <board_led.h>
+#include <board.h>
+#include <board_digital_out_pin.h>
 #include <esc.h>
 #include <imu.h>
 #include <pulse_out.h>
@@ -28,7 +29,7 @@ static PulseOut steering(&steeringPin,
 static ReversibleEsc esc(&escPin);
 static Mpu6050Imu imu(&Wire);
 static SteeringAssist assist(DRIFT_FULL_LOCK_DPS);
-static BoardLed led;
+static BoardDigitalOutPin led(BOARD_LED_PIN, BOARD_LED_ON);
 
 #if DRIFT_CONTROLLER == DRIFT_CONTROLLER_RECEIVER
 static ReceiverInput input(DRIFT_GAIN);
@@ -143,7 +144,7 @@ void loop() {
     drive(input.command());
   }
   if (DRIFT_STATUS_LED) {
-    led.write(statusLed(status, millis()) ? HIGH : LOW);
+    led.write(statusLed(status, millis()));
   }
   // Sleeps a tick so core 1's idle task runs; Bluepad32 delivers gamepad data far less often than this.
   delay(1);

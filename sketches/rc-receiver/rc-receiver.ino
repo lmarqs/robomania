@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <pulse_in_pin.h>
+#include <board_pulse_in_pin.h>
 #include <serial_io.h>
 
 #if __has_include("local.h")
@@ -17,13 +17,13 @@ const size_t CHANNELS = sizeof(PINS) / sizeof(PINS[0]);
 const uint32_t SIGNAL_TIMEOUT_US = 100000;
 const uint32_t PRINT_EVERY_MS = 100;
 
-static EspPulseInPin* inputs[CHANNELS];
+static BoardPulseInPin* inputs[CHANNELS];
 static SerialOutput output;
 
 void setup() {
   output.begin("rc-receiver");
   for (size_t i = 0; i < CHANNELS; i++) {
-    inputs[i] = new EspPulseInPin(PINS[i]);
+    inputs[i] = new BoardPulseInPin(PINS[i]);
     if (!inputs[i]->begin()) {
       output.printf("error gpio %u has no interrupt\n", PINS[i]);
     }

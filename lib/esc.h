@@ -2,8 +2,8 @@
 
 #include <stdint.h>
 
-#include "pin.h"
 #include "pulse_out.h"
+#include "pwm_out_pin.h"
 
 /**
  * An electronic speed controller for a brushless motor that spins one way, driven by pulse width on a PWM pin, such as

@@ -5,7 +5,7 @@
 #include <esp_arduino_version.h>
 #endif
 
-#include "pin.h"
+#include "pwm_out_pin.h"
 
 /**
  * A PWM pin on the board the sketch is built for. With no frequency it runs at the rate analogWrite() uses, on any pin

@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "pin.h"
+#include "pwm_out_pin.h"
 
 /**
  * The duty, from 0 to PwmOutPin::DUTY_MAX, that makes a pin running at `frequencyHz` hold each pulse high for `pulseUs`

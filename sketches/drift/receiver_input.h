@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pulse_in_pin.h>
+#include <board_pulse_in_pin.h>
 
 #include "./drive_input.h"
 
@@ -10,7 +10,7 @@
  */
 class ReceiverInput : public DriveInput {
  private:
-  EspPulseInPin throttlePin, steeringPin;
+  BoardPulseInPin throttlePin, steeringPin;
   float gain;
   uint32_t lastUpdateMs = 0;
   uint32_t throttleUs = 0, steeringUs = 0;

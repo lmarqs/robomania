@@ -2,8 +2,8 @@
 
 #include <stdint.h>
 
-#include "pin.h"
 #include "pulse_width.h"
+#include "pwm_out_pin.h"
 
 /**
  * A servo-style pulse on a PWM pin, set by a position from -1 to 1: the one path from a position to a pulse to a duty

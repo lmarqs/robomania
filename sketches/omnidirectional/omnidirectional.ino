@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <Bluepad32.h>
 #include <Wire.h>
-#include <digital_pin.h>
+#include <board.h>
+#include <board_digital_out_pin.h>
 #include <h_bridge.h>
-#include <pin.h>
 #include <board_pwm_out_pin.h>
 
 #include "./car.h"
@@ -13,7 +13,7 @@
 const uint32_t COMMAND_TIMEOUT_MS = 500;
 const uint32_t LED_BLINK_MS = 500;
 
-DigitalOutPin led(2);
+BoardDigitalOutPin led(BOARD_LED_PIN, BOARD_LED_ON);
 CarPilot pilot;
 DriveCommandSource commands(COMMAND_TIMEOUT_MS);
 Controller* controller = NULL;
@@ -71,7 +71,7 @@ void loop() {
                  {{controller->axisX(), controller->axisY()}, {controller->axisRX(), controller->axisRY()}}, now);
   }
 
-  led.write(controller || (now / LED_BLINK_MS) % 2 ? HIGH : LOW);
+  led.write(controller || (now / LED_BLINK_MS) % 2);
 
   DriveCommand command;
 

@@ -1,8 +1,9 @@
 #include <Arduino.h>
-#include <board_led.h>
+#include <board.h>
+#include <board_digital_out_pin.h>
 #include <serial_io.h>
 
-BoardLed led;
+BoardDigitalOutPin led(BOARD_LED_PIN, BOARD_LED_ON);
 SerialOutput output;
 
 void setup() {
@@ -12,9 +13,9 @@ void setup() {
 
 void loop() {
   output.println("HIGH");
-  led.write(HIGH);
+  led.write(true);
   delay(1000);
   output.println("LOW");
-  led.write(LOW);
+  led.write(false);
   delay(1000);
 }

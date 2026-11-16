@@ -20,7 +20,7 @@ void HBridge::move(int32_t value) {
   }
 }
 
-FullHBridge::FullHBridge(PwmOutPin* pwm, OutPin* in1, OutPin* in2) {
+FullHBridge::FullHBridge(PwmOutPin* pwm, DigitalOutPin* in1, DigitalOutPin* in2) {
   this->pwm = pwm;
   this->in1 = in1;
   this->in2 = in2;
@@ -35,24 +35,24 @@ bool FullHBridge::begin() {
 void FullHBridge::forward(int32_t value) {
   HBridge::signal();
 
-  in1->write(HIGH);
-  in2->write(LOW);
+  in1->write(true);
+  in2->write(false);
   pwm->write(constrain(value, 0, PwmOutPin::DUTY_MAX));
 }
 
 void FullHBridge::backward(int32_t value) {
   HBridge::signal();
 
-  in1->write(LOW);
-  in2->write(HIGH);
+  in1->write(false);
+  in2->write(true);
   pwm->write(constrain(value, 0, PwmOutPin::DUTY_MAX));
 }
 
 void FullHBridge::stop() {
   HBridge::signal();
 
-  in1->write(LOW);
-  in2->write(LOW);
+  in1->write(false);
+  in2->write(false);
   pwm->write(0);
 }
 

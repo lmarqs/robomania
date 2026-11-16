@@ -1,8 +1,9 @@
 #include <Arduino.h>
-#include <board_led.h>
+#include <board.h>
+#include <board_digital_out_pin.h>
 #include <serial_io.h>
 
-BoardLed led;
+BoardDigitalOutPin led(BOARD_LED_PIN, BOARD_LED_ON);
 SerialInput input;
 SerialOutput output;
 int blinkDelay = 1000;

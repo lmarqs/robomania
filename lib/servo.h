@@ -2,8 +2,8 @@
 
 #include <stdint.h>
 
-#include "pin.h"
 #include "pulse_out.h"
+#include "pwm_out_pin.h"
 
 /**
  * A servo that holds the angle each pulse width encodes, from 0 to `range` degrees, such as 180, driven by a PWM pin

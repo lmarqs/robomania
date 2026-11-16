@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 #include <EEPROM.h>
-#include <board_led.h>
-#include <digital_pin.h>
+#include <board.h>
+#include <board_digital_out_pin.h>
 #include <serial_io.h>
 
 #if defined(ESP8266)
@@ -38,12 +38,12 @@ using HttpServer = WebServer;
 
 #if defined(ESP8266)
 // ESP-01S: GPIO0 drives the relay and is a boot strap, where LOW at reset enters flash mode.
-static DigitalOutPin relay(0, LOW);
+static BoardDigitalOutPin relay(0, LOW);
 #elif defined(ESP32)
 // ESP32 DevKit: GPIO23 stays LOW at boot, so the relay does not click during reset or flashing.
-static DigitalOutPin relay(23, HIGH);
+static BoardDigitalOutPin relay(23, HIGH);
 #endif
-static BoardLed led;
+static BoardDigitalOutPin led(BOARD_LED_PIN, BOARD_LED_ON);
 
 // The blink setting sits at 0 and the serial settings after it, with room left for a record to grow.
 static const size_t EEPROM_SIZE = 256;
