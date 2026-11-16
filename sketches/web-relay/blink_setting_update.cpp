@@ -5,36 +5,36 @@
 
 #include "blink_setting.h"
 
-BlinkOutcome applyMode(BlinkController& controller, const char* arg, uint32_t now) {
+BlinkOutcome applyMode(BlinkSchedule& schedule, const char* arg, uint32_t now) {
   BlinkMode mode;
   if (!parseBlinkMode(arg, mode)) {
     return BlinkOutcome::Rejected;
   }
-  if (mode == controller.mode()) {
+  if (mode == schedule.mode()) {
     return BlinkOutcome::Unchanged;
   }
-  controller.setMode(mode);
-  controller.update(now);
+  schedule.setMode(mode);
+  schedule.update(now);
   return BlinkOutcome::Accepted;
 }
 
-BlinkOutcome applyPeriod(BlinkController& controller, const char* arg, uint32_t now) {
+BlinkOutcome applyPeriod(BlinkSchedule& schedule, const char* arg, uint32_t now) {
   char* end;
   const long requested = strtol(arg, &end, 10);
   if (end == arg || *end != '\0' || requested <= 0) {
     return BlinkOutcome::Rejected;
   }
 
-  const uint32_t before = controller.period();
-  controller.setPeriod(static_cast<uint32_t>(requested));
-  if (controller.period() == before) {
+  const uint32_t before = schedule.period();
+  schedule.setPeriod(static_cast<uint32_t>(requested));
+  if (schedule.period() == before) {
     return BlinkOutcome::Unchanged;
   }
-  controller.update(now);
+  schedule.update(now);
   return BlinkOutcome::Accepted;
 }
 
-void statusJson(const BlinkController& controller, char* buf, size_t n) {
-  snprintf(buf, n, "{\"mode\":\"%s\",\"period\":%lu,\"lamp\":%s}", blinkModeName(controller.mode()),
-           static_cast<unsigned long>(controller.period()), controller.output().isOn() ? "true" : "false");
+void statusJson(const BlinkSchedule& schedule, char* buf, size_t n) {
+  snprintf(buf, n, "{\"mode\":\"%s\",\"period\":%lu,\"lamp\":%s}", blinkModeName(schedule.mode()),
+           static_cast<unsigned long>(schedule.period()), schedule.output().isOn() ? "true" : "false");
 }

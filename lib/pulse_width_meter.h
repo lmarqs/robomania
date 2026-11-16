@@ -3,11 +3,11 @@
 #include <stdint.h>
 
 /**
- * Times high pulses from the edges a pin interrupt reports, on any board: the logic BoardPulseInPin runs in its
+ * Measures high pulses from the edges a pin interrupt reports, on any board: the logic BoardPulseInPin runs in its
  * interrupt handler. Its methods are always inlined, so a handler that must run from RAM, as on the ESP8266, never
  * calls into flash. The caller guards a copy against the handler, as BoardPulseInPin does.
  */
-class PulseTimer {
+class PulseWidthMeter {
  private:
   bool high = false;
   bool hasPulse = false;

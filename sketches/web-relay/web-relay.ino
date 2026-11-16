@@ -16,7 +16,7 @@ using HttpServer = ESP8266WebServer;
 using HttpServer = WebServer;
 #endif
 
-#include "./blink_controller.h"
+#include "./blink_schedule.h"
 #include "./blink_setting.h"
 #include "./blink_setting_update.h"
 #include "./config_command.h"
@@ -56,7 +56,7 @@ static_assert(CONFIG_OFFSET + sizeof(StoredConfig) <= EEPROM_SIZE, "the serial s
 
 static const ConfigDefaults CONFIG_DEFAULTS{WEB_RELAY_AP_SSID, WEB_RELAY_AP_PASSWORD, WEB_RELAY_OTA_PASSWORD};
 
-static BlinkController blinker;
+static BlinkSchedule blinker;
 static StoredConfig config = emptyConfig();
 static SerialInput serialInput;
 static SerialOutput serialOutput;

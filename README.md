@@ -103,7 +103,7 @@ The drivers in `lib/`:
 | `motor.h` | The motor interface: a throttle from -1, full reverse, to 1, full forward |
 | `direction_pwm_motor.*`, `pwm_pair_motor.*` | A DC motor on an H-bridge: two direction pins and a PWM pin, or a pair of PWM pins |
 | `pulse_motor.*` | A motor driven by a servo-style pulse: an ESC, one way or reversible, or a continuous-rotation (360°) servo |
-| `pulse_timer.h` | The width of the last pulse from the edges an interrupt reports |
+| `pulse_width_meter.h` | The width of the last pulse from the edges an interrupt reports |
 | `positional_servo.*` | A positional servo, such as 0° to 180° |
 | `rc_channel.*` | An RC receiver channel's pulse width as a stick position or a knob level |
 | `pulse_range.*` | A position from -1 to 1 as a pulse between low, center and high, and back |

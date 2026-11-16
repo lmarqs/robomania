@@ -17,12 +17,12 @@ bool BoardPulseInPin::begin() {
 // An interrupt handler must run from RAM: the flash cache may be busy when the edge arrives.
 void IRAM_ATTR BoardPulseInPin::onEdge(void* self) {
   BoardPulseInPin* input = (BoardPulseInPin*)self;
-  input->timer.recordEdge(digitalRead(input->pin) == HIGH, micros());
+  input->meter.recordEdge(digitalRead(input->pin) == HIGH, micros());
 }
 
 uint32_t BoardPulseInPin::read(uint32_t maxAgeUs) {
   noInterrupts();
-  const PulseTimer snapshot = timer;
+  const PulseWidthMeter snapshot = meter;
   interrupts();
   return snapshot.widthUs(micros(), maxAgeUs);
 }

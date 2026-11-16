@@ -15,13 +15,13 @@ void ARDUINO_ISR_ATTR BoardPulseInPin::onEdge(void* self) {
   const uint32_t nowUs = micros();
   const bool high = digitalRead(input->pin) == HIGH;
   portENTER_CRITICAL_ISR(&input->lock);
-  input->timer.recordEdge(high, nowUs);
+  input->meter.recordEdge(high, nowUs);
   portEXIT_CRITICAL_ISR(&input->lock);
 }
 
 uint32_t BoardPulseInPin::read(uint32_t maxAgeUs) {
   portENTER_CRITICAL(&lock);
-  const PulseTimer snapshot = timer;
+  const PulseWidthMeter snapshot = meter;
   portEXIT_CRITICAL(&lock);
   return snapshot.widthUs(micros(), maxAgeUs);
 }

@@ -21,12 +21,12 @@ bool BoardPulseInPin::begin() {
 
 void BoardPulseInPin::onEdge(void* self) {
   BoardPulseInPin* input = (BoardPulseInPin*)self;
-  input->timer.recordEdge(digitalRead(input->pin) == HIGH, micros());
+  input->meter.recordEdge(digitalRead(input->pin) == HIGH, micros());
 }
 
 uint32_t BoardPulseInPin::read(uint32_t maxAgeUs) {
   noInterrupts();
-  const PulseTimer snapshot = timer;
+  const PulseWidthMeter snapshot = meter;
   interrupts();
   return snapshot.widthUs(micros(), maxAgeUs);
 }

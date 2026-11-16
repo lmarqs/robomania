@@ -152,7 +152,7 @@
     const knob = $('knob');
     const led = $('led');
     const light = $('light');
-    const STICK_CENTRE = { x: -52, y: 44 };
+    const STICK_CENTER = { x: -52, y: 44 };
     const keys: Record<string, boolean> = {};
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let car = PARKED;
@@ -165,7 +165,7 @@
     }
     function dragTo(e: PointerEvent) {
       const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(stick.getScreenCTM()!.inverse());
-      moveKnob(tiltStick(p.x - STICK_CENTRE.x, p.y - STICK_CENTRE.y));
+      moveKnob(tiltStick(p.x - STICK_CENTER.x, p.y - STICK_CENTER.y));
     }
     stick.addEventListener('pointerdown', (e) => { stick.classList.add('dragging'); stick.setPointerCapture(e.pointerId); dragTo(e); });
     stick.addEventListener('pointermove', (e) => { if (tilt) dragTo(e); });

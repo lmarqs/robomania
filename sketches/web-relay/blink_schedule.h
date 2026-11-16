@@ -15,7 +15,7 @@ enum class BlinkMode : uint8_t {
  * The lamp's state machine, with the clock passed in as an argument. Its timing survives the rollover of millis()
  * after 49.7 days.
  */
-class BlinkController {
+class BlinkSchedule {
  public:
   static constexpr uint32_t PERIOD_MIN_MS = 200;
   static constexpr uint32_t PERIOD_MAX_MS = 3600000;

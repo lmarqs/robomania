@@ -1,6 +1,6 @@
-#include "blink_controller.h"
+#include "blink_schedule.h"
 
-void BlinkController::setMode(BlinkMode mode) {
+void BlinkSchedule::setMode(BlinkMode mode) {
   if (mode == mode_) {
     return;
   }
@@ -9,15 +9,15 @@ void BlinkController::setMode(BlinkMode mode) {
   started_ = false;
 }
 
-void BlinkController::setPeriod(uint32_t periodMs) { periodMs_ = clampPeriod(periodMs); }
+void BlinkSchedule::setPeriod(uint32_t periodMs) { periodMs_ = clampPeriod(periodMs); }
 
-void BlinkController::restore(BlinkMode mode, uint32_t periodMs) {
+void BlinkSchedule::restore(BlinkMode mode, uint32_t periodMs) {
   mode_ = mode;
   periodMs_ = clampPeriod(periodMs);
   started_ = false;
 }
 
-bool BlinkController::update(uint32_t nowMs) {
+bool BlinkSchedule::update(uint32_t nowMs) {
   if (mode_ != BlinkMode::BLINK) {
     const bool desired = mode_ == BlinkMode::ON;
     if (desired == output_) {
@@ -43,7 +43,7 @@ bool BlinkController::update(uint32_t nowMs) {
   return true;
 }
 
-uint32_t BlinkController::clampPeriod(uint32_t periodMs) {
+uint32_t BlinkSchedule::clampPeriod(uint32_t periodMs) {
   if (periodMs < PERIOD_MIN_MS) {
     return PERIOD_MIN_MS;
   }
