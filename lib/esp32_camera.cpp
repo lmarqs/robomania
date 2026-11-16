@@ -28,15 +28,26 @@ static bool reserveClock(camera_config_t& config) {
 
 static void releaseClock(const camera_config_t& config) { esp32LedcReleaseTimer(config.ledc_timer); }
 #else
+static bool isChannelAttached(uint8_t channel) {
+  for (uint8_t pin = 0; pin < SOC_GPIO_PIN_COUNT; pin++) {
+    const ledc_channel_handle_t* bus = (ledc_channel_handle_t*)perimanGetPinBus(pin, ESP32_BUS_TYPE_LEDC);
+    if (bus && bus->channel == channel) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // Core 3 counts a timer as used only when a pin it attached runs on it, so the XCLK pin is attached first, on the last
 // channel of the low-speed group the camera driver uses, and the driver then sets the same timer and channel again.
+// ledcAttachChannel() shares a channel another pin already holds, which would hand that pin's timer to the camera.
 static bool reserveClock(camera_config_t& config) {
 #ifdef SOC_LEDC_SUPPORT_HS_MODE
   const uint8_t channel = SOC_LEDC_CHANNEL_NUM * 2 - 1;
 #else
   const uint8_t channel = SOC_LEDC_CHANNEL_NUM - 1;
 #endif
-  if (!ledcAttachChannel(XCLK_GPIO_NUM, XCLK_HZ, 1, channel)) {
+  if (isChannelAttached(channel) || !ledcAttachChannel(XCLK_GPIO_NUM, XCLK_HZ, 1, channel)) {
     return false;
   }
   const ledc_channel_handle_t* bus = (ledc_channel_handle_t*)perimanGetPinBus(XCLK_GPIO_NUM, ESP32_BUS_TYPE_LEDC);
