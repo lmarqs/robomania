@@ -43,6 +43,11 @@ _Avoid_: speed controller, motor controller
 
 ## Signals
 
+**Level**:
+Where a signal stands between low and high. A digital pin has two levels, low and high; as a number, 0 is low, 1 is
+high, and the values between say how much of the way, as a PWM duty or a knob's setting does.
+_Avoid_: value, amount, when a level is meant
+
 **PWM**:
 A square wave at a fixed frequency whose high time in each period carries the value.
 
