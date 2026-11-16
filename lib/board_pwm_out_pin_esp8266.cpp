@@ -16,27 +16,24 @@ bool BoardPwmOutPin::begin() {
     return false;
   }
   const uint32_t hz = requestedHz ? requestedHz : ANALOG_WRITE_HZ;
-  periodCycles = microsecondsToClockCycles(1000000UL) / hz;
-  if (periodCycles == 0) {
+  steps = microsecondsToClockCycles(1000000UL) / hz;
+  if (steps == 0) {
     return false;
   }
-  actualHz = microsecondsToClockCycles(1000000UL) / periodCycles;
+  actualHz = microsecondsToClockCycles(1000000UL) / steps;
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
   return true;
 }
 
-void BoardPwmOutPin::write(uint16_t duty) {
-  if (!actualHz) {
-    return;
-  }
-  const uint32_t highCycles = ((uint64_t)periodCycles * duty + DUTY_MAX / 2) / DUTY_MAX;
+// Each step is one CPU clock cycle.
+void BoardPwmOutPin::writeSteps(uint32_t highSteps) {
   // The generator needs time both high and low in each period, so the two ends hold the pin at a level instead.
-  if (highCycles == 0 || highCycles == periodCycles) {
+  if (highSteps == 0 || highSteps == steps) {
     stopWaveform(pin);
-    digitalWrite(pin, highCycles == 0 ? LOW : HIGH);
+    digitalWrite(pin, highSteps == 0 ? LOW : HIGH);
     return;
   }
-  startWaveformClockCycles(pin, highCycles, periodCycles - highCycles);
+  startWaveformClockCycles(pin, highSteps, steps - highSteps);
 }
 #endif

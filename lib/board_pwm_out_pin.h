@@ -23,16 +23,14 @@ class BoardPwmOutPin : public PwmOutPin {
   uint8_t pin;
   uint32_t requestedHz;
   uint32_t actualHz = 0;
-#if defined(ESP32)
-  uint8_t bits = 0;
-#if ESP_ARDUINO_VERSION_MAJOR < 3
+  // The hardware's counts per period: write() turns a duty into a count from 0 to this, and the board sets the pin.
+  uint32_t steps = 0;
+#if defined(ESP32) && ESP_ARDUINO_VERSION_MAJOR < 3
   int8_t channel = -1;
 #endif
-#elif defined(ESP8266)
-  uint32_t periodCycles = 0;
-#elif defined(__AVR__)
-  bool usesTimer1 = false;
-#endif
+
+  /** Holds the pin high for `highSteps` of each period's `steps`; begin() has succeeded. */
+  void writeSteps(uint32_t highSteps);
 
  public:
   /** `frequencyHz` 0, the default, runs at the board's analogWrite() rate. */

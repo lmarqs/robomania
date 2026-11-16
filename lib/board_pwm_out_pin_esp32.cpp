@@ -29,7 +29,7 @@ bool BoardPwmOutPin::begin() {
     return true;
   }
   const uint32_t hz = requestedHz ? requestedHz : ANALOG_WRITE_HZ;
-  bits = bitsFor(hz);
+  const uint8_t bits = bitsFor(hz);
 #if ESP_ARDUINO_VERSION_MAJOR < 3
   channel = esp32LedcTakeChannel(hz, bits);
   if (channel < 0) {
@@ -57,18 +57,16 @@ bool BoardPwmOutPin::begin() {
     return false;
   }
 #endif
+  // LEDC holds the pin high all period at a duty of 2^bits, one past the largest the bits count to.
+  steps = 1UL << bits;
   return true;
 }
 
-void BoardPwmOutPin::write(uint16_t duty) {
-  if (!actualHz) {
-    return;
-  }
-  const uint32_t level = ((uint64_t)duty << bits) / DUTY_MAX;
+void BoardPwmOutPin::writeSteps(uint32_t highSteps) {
 #if ESP_ARDUINO_VERSION_MAJOR < 3
-  ledcWrite(channel, level);
+  ledcWrite(channel, highSteps);
 #else
-  ledcWrite(pin, level);
+  ledcWrite(pin, highSteps);
 #endif
 }
 #endif

@@ -6,6 +6,8 @@
 static const uint32_t ANALOG_WRITE_PRESCALER = 64;
 static const uint32_t TIMER0_STEPS = 256;
 static const uint32_t PHASE_CORRECT_STEPS = 510;
+// analogWrite() takes a duty from 0 to 255, where 255 holds the pin high all period.
+static const uint32_t ANALOG_WRITE_STEPS = 255;
 
 static uint32_t analogWriteHz(uint8_t timer) {
   const bool timer0 = timer == TIMER0A || timer == TIMER0B;
@@ -68,6 +70,7 @@ bool BoardPwmOutPin::begin() {
 #endif
     pinMode(pin, OUTPUT);
     analogWrite(pin, 0);
+    steps = ANALOG_WRITE_STEPS;
     actualHz = analogWriteHz(timer);
     return true;
   }
@@ -80,7 +83,7 @@ bool BoardPwmOutPin::begin() {
   }
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
-  usesTimer1 = true;
+  steps = timer1Top + 1UL;
   actualHz = timer1ActualHz;
   return true;
 #else
@@ -88,15 +91,12 @@ bool BoardPwmOutPin::begin() {
 #endif
 }
 
-void BoardPwmOutPin::write(uint16_t duty) {
-  if (!actualHz) {
-    return;
-  }
+// A pin begin() started at a frequency of its own runs on Timer1; any other runs on analogWrite().
+void BoardPwmOutPin::writeSteps(uint32_t highSteps) {
 #ifdef HAS_TIMER1
-  if (usesTimer1) {
+  if (requestedHz) {
     const bool channelA = digitalPinToTimer(pin) == TIMER1A;
     const uint8_t connect = channelA ? _BV(COM1A1) : _BV(COM1B1);
-    const uint32_t highSteps = ((uint32_t)duty * (timer1Top + 1UL) + DUTY_MAX / 2) / DUTY_MAX;
     if (highSteps == 0) {
       TCCR1A &= ~connect;
       digitalWrite(pin, LOW);
@@ -112,6 +112,6 @@ void BoardPwmOutPin::write(uint16_t duty) {
     return;
   }
 #endif
-  analogWrite(pin, ((uint32_t)duty * 255 + DUTY_MAX / 2) / DUTY_MAX);
+  analogWrite(pin, highSteps);
 }
 #endif
