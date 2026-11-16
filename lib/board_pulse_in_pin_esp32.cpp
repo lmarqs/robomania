@@ -15,24 +15,14 @@ void ARDUINO_ISR_ATTR BoardPulseInPin::onEdge(void* self) {
   const uint32_t nowUs = micros();
   const bool high = digitalRead(input->pin) == HIGH;
   portENTER_CRITICAL_ISR(&input->lock);
-  // A falling edge counts only after a rising one, so the first pulse after begin() is never half of one.
-  if (!high && input->high) {
-    input->widthUs = nowUs - input->lastEdgeUs;
-    input->endUs = nowUs;
-  }
-  input->high = high;
-  input->lastEdgeUs = nowUs;
+  input->timer.recordEdge(high, nowUs);
   portEXIT_CRITICAL_ISR(&input->lock);
 }
 
 uint32_t BoardPulseInPin::read(uint32_t maxAgeUs) {
   portENTER_CRITICAL(&lock);
-  const uint32_t width = widthUs;
-  const uint32_t end = endUs;
+  const PulseTimer snapshot = timer;
   portEXIT_CRITICAL(&lock);
-  if (end == 0 || micros() - end > maxAgeUs) {
-    return 0;
-  }
-  return width;
+  return snapshot.widthUs(micros(), maxAgeUs);
 }
 #endif

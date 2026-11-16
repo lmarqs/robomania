@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 #include "pulse_in_pin.h"
+#include "pulse_timer.h"
 
 /**
  * A pulse input on the board the sketch is built for, timed by an interrupt on each edge, so reading it never waits
@@ -16,10 +17,7 @@
 class BoardPulseInPin : public PulseInPin {
  private:
   uint8_t pin;
-  volatile bool high = false;
-  volatile uint32_t lastEdgeUs = 0;
-  volatile uint32_t widthUs = 0;
-  volatile uint32_t endUs = 0;
+  PulseTimer timer;
 #ifdef ESP32
   portMUX_TYPE lock = portMUX_INITIALIZER_UNLOCKED;
 #endif

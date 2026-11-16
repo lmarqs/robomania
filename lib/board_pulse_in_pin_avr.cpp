@@ -21,25 +21,13 @@ bool BoardPulseInPin::begin() {
 
 void BoardPulseInPin::onEdge(void* self) {
   BoardPulseInPin* input = (BoardPulseInPin*)self;
-  const uint32_t nowUs = micros();
-  const bool high = digitalRead(input->pin) == HIGH;
-  // A falling edge counts only after a rising one, so the first pulse after begin() is never half of one.
-  if (!high && input->high) {
-    input->widthUs = nowUs - input->lastEdgeUs;
-    input->endUs = nowUs;
-  }
-  input->high = high;
-  input->lastEdgeUs = nowUs;
+  input->timer.recordEdge(digitalRead(input->pin) == HIGH, micros());
 }
 
 uint32_t BoardPulseInPin::read(uint32_t maxAgeUs) {
   noInterrupts();
-  const uint32_t width = widthUs;
-  const uint32_t end = endUs;
+  const PulseTimer snapshot = timer;
   interrupts();
-  if (end == 0 || micros() - end > maxAgeUs) {
-    return 0;
-  }
-  return width;
+  return snapshot.widthUs(micros(), maxAgeUs);
 }
 #endif
