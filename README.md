@@ -101,7 +101,7 @@ The drivers in `lib/`:
 | `line_reader.*` | Serial bytes split into lines |
 | `serial_input.*`, `serial_output.*` | The serial port as lines: read without waiting, printed with `Print` and `printf()` |
 | `motor.h` | The motor interface: a throttle from -1, full reverse, to 1, full forward |
-| `l298n_motor.*`, `drv8833_motor.*` | A DC motor on an H-bridge chip, named after the chip whose wiring it uses |
+| `direction_pwm_motor.*`, `pwm_pair_motor.*` | A DC motor on an H-bridge: two direction pins and a PWM pin, or a pair of PWM pins |
 | `pulse_motor.*` | A motor driven by a servo-style pulse: an ESC, one way or reversible, or a continuous-rotation (360°) servo |
 | `pulse_timer.h` | The width of the last pulse from the edges an interrupt reports |
 | `positional_servo.*` | A positional servo, such as 0° to 180° |

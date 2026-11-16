@@ -9,14 +9,14 @@
  * direction and the enable pin's duty sets how hard the motor turns. At throttle 0 both inputs go low and the motor
  * coasts.
  */
-class L298nMotor : public Motor {
+class DirectionPwmMotor : public Motor {
  private:
   PwmOutPin* enable;
   DigitalOutPin* in1;
   DigitalOutPin* in2;
 
  public:
-  L298nMotor(PwmOutPin* enable, DigitalOutPin* in1, DigitalOutPin* in2);
+  DirectionPwmMotor(PwmOutPin* enable, DigitalOutPin* in1, DigitalOutPin* in2);
 
   bool begin() override;
   void write(float throttle) override;

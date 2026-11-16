@@ -1,14 +1,14 @@
-#include <drv8833_motor.h>
 #include <host_test.h>
+#include <pwm_pair_motor.h>
 
 #include "fake_pwm_out_pin.h"
 
 struct Bridge {
   FakePwmOutPin in1, in2;
-  Drv8833Motor motor{&in1, &in2};
+  PwmPairMotor motor{&in1, &in2};
 };
 
-void test_drv8833_starts_both_pins_low(void) {
+void test_pwm_pair_starts_both_pins_low(void) {
   Bridge bridge;
   TEST_ASSERT_TRUE(bridge.motor.begin());
   TEST_ASSERT_TRUE(bridge.in1.started && bridge.in2.started);
@@ -16,13 +16,13 @@ void test_drv8833_starts_both_pins_low(void) {
   TEST_ASSERT_EQUAL(0, bridge.in2.duty);
 }
 
-void test_drv8833_reports_a_pin_that_cannot_start(void) {
+void test_pwm_pair_reports_a_pin_that_cannot_start(void) {
   Bridge bridge;
   bridge.in2.starts = false;
   TEST_ASSERT_FALSE(bridge.motor.begin());
 }
 
-void test_drv8833_drives_forward_on_in1_and_backward_on_in2(void) {
+void test_pwm_pair_drives_forward_on_in1_and_backward_on_in2(void) {
   Bridge bridge;
   bridge.motor.begin();
   bridge.motor.write(0.25f);
@@ -33,7 +33,7 @@ void test_drv8833_drives_forward_on_in1_and_backward_on_in2(void) {
   TEST_ASSERT_EQUAL(16384, bridge.in2.duty);
 }
 
-void test_drv8833_coasts_at_zero(void) {
+void test_pwm_pair_coasts_at_zero(void) {
   Bridge bridge;
   bridge.motor.begin();
   bridge.motor.write(1.0f);
@@ -44,9 +44,9 @@ void test_drv8833_coasts_at_zero(void) {
 
 int main(int, char**) {
   UNITY_BEGIN();
-  RUN_TEST(test_drv8833_starts_both_pins_low);
-  RUN_TEST(test_drv8833_reports_a_pin_that_cannot_start);
-  RUN_TEST(test_drv8833_drives_forward_on_in1_and_backward_on_in2);
-  RUN_TEST(test_drv8833_coasts_at_zero);
+  RUN_TEST(test_pwm_pair_starts_both_pins_low);
+  RUN_TEST(test_pwm_pair_reports_a_pin_that_cannot_start);
+  RUN_TEST(test_pwm_pair_drives_forward_on_in1_and_backward_on_in2);
+  RUN_TEST(test_pwm_pair_coasts_at_zero);
   return UNITY_END();
 }

@@ -37,10 +37,13 @@ supported board, and that it lives in `lib/board_pwm_out_pin.h`.
 | Interface: pure virtual, no Arduino core | `<Thing>`: `DigitalOutPin`, `PwmOutPin`, `Motor` | `<thing>.h`, no `.cpp` |
 | Implementation on the Arduino API, for every supported board | `Board<Thing>`: `BoardPwmOutPin` | `board_<thing>.h` and `.cpp` |
 | Code that runs only on the ESP32 | `Esp32<Thing>`: `Esp32Camera`; functions `esp32<Verb>…()` | `esp32_<thing>.h`, wrapped in `#ifdef ESP32` |
-| Driver of a device that implements an interface | `<Device><Interface>`: `L298nMotor`, `PulseMotor` | snake_case of the class |
+| Driver of a device that implements an interface | `<Signal><Interface>`: `PulseMotor`, `DirectionPwmMotor` | snake_case of the class |
 | Driver or logic with no interface | `<Qualifier><Thing>`: `Mpu6050Imu`, `RcChannel` | snake_case of the class |
 | Test double | `Fake<Interface>`: `FakePwmOutPin` | `test/fake_<thing>.h` |
 
+- A driver that implements an interface MUST be named after the signals it sends its device, such as `PulseMotor`'s
+  servo pulse or `PwmPairMotor`'s two PWM pins, and its doc comment MUST name the devices or chips it fits. Many
+  devices share one wiring, so the signal tells a sketch's author which class fits the hardware in hand.
 - A header MUST hold one public class, and besides it only the types its interface takes or returns, such as
   `ImuSample` beside `Mpu6050Imu`. One class per file makes the file name the index a reader searches by.
 - A `Board` class whose code differs per chip family MUST keep each chip family's part in `board_<thing>_<family>.cpp`

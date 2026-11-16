@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <board_digital_out_pin.h>
 #include <board_pwm_out_pin.h>
-#include <l298n_motor.h>
+#include <direction_pwm_motor.h>
 #include <motor.h>
 
 #include "wheel_mixer.h"
@@ -11,22 +11,22 @@
 BoardPwmOutPin pwm1(15, 5000);
 BoardDigitalOutPin in11(04);
 BoardDigitalOutPin in21(16);
-L298nMotor motor1(&pwm1, &in11, &in21);
+DirectionPwmMotor motor1(&pwm1, &in11, &in21);
 
 BoardPwmOutPin pwm2(18, 5000);
 BoardDigitalOutPin in12(05);
 BoardDigitalOutPin in22(17);
-L298nMotor motor2(&pwm2, &in12, &in22);
+DirectionPwmMotor motor2(&pwm2, &in12, &in22);
 
 BoardPwmOutPin pwm3(25, 5000);
 BoardDigitalOutPin in13(27);
 BoardDigitalOutPin in23(26);
-L298nMotor motor3(&pwm3, &in13, &in23);
+DirectionPwmMotor motor3(&pwm3, &in13, &in23);
 
 BoardPwmOutPin pwm4(13, 5000);
 BoardDigitalOutPin in14(14);
 BoardDigitalOutPin in24(12);
-L298nMotor motor4(&pwm4, &in14, &in24);
+DirectionPwmMotor motor4(&pwm4, &in14, &in24);
 
 // The wheels run at four fifths of full speed at most.
 const float MAX_THROTTLE = 0.8f;

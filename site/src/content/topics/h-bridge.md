@@ -24,9 +24,9 @@ to ground through the switches, called shoot-through, and it destroys them.
 
 ## In the project's code
 
-Real H-bridges come as chips, with transistors for switches, and the library names each motor driver after the chip
-whose wiring it uses. `L298nMotor`, for an L298N, uses three pins for each motor: two direction pins and one PWM pin
-that sets how hard the motor turns. `Drv8833Motor`, for a DRV8833, uses two PWM pins, one for each direction. Like
+Real H-bridges come as chips, with transistors for switches, and the library names each motor driver after the
+signals it sends. `DirectionPwmMotor`, for an L298N, uses three pins for each motor: two direction pins and one PWM
+pin that sets how hard the motor turns. `PwmPairMotor`, for a DRV8833, uses two PWM pins, one for each direction. Like
 every motor in the library, both take a throttle from -1, full reverse, to 1, full forward. The table shows the
 L298N's pins.
 
@@ -37,7 +37,7 @@ L298N's pins.
 | `write(0)` | low | low | 0 |
 
 What both direction pins low does, brake or coast, depends on the chip; its datasheet says. The driver's header is
-on the [Library](../../library/#l298n_motor.h) page.
+on the [Library](../../library/#direction_pwm_motor.h) page.
 
 <div class="gap">
 

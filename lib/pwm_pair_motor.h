@@ -8,13 +8,13 @@
  * direction: `in1`'s duty drives it forward and `in2`'s backward. At throttle 0 both inputs go low and the motor
  * coasts.
  */
-class Drv8833Motor : public Motor {
+class PwmPairMotor : public Motor {
  private:
   PwmOutPin* in1;
   PwmOutPin* in2;
 
  public:
-  Drv8833Motor(PwmOutPin* in1, PwmOutPin* in2);
+  PwmPairMotor(PwmOutPin* in1, PwmOutPin* in2);
 
   bool begin() override;
   void write(float throttle) override;
