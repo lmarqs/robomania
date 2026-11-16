@@ -97,6 +97,7 @@ The drivers in `lib/`:
 | `digital_in_pin.h`, `digital_out_pin.h`, `analog_in_pin.h`, `pwm_out_pin.h`, `pulse_in_pin.h` | The pin interfaces, free of the Arduino core: a level in or out, a voltage in, a PWM duty out, a pulse width in |
 | `board_*_pin.*` | Each pin interface on the board the sketch is built for: the ESP32, the ESP8266 or an AVR such as the Nano |
 | `board_led.h` | The LED on the board the sketch is built for |
+| `board_servo_pin.h` | A pin that drives a servo on the board the sketch is built for |
 | `line_reader.*` | Serial bytes split into lines |
 | `serial_input.*`, `serial_output.*` | The serial port as lines: read without waiting, printed with `Print` and `printf()` |
 | `motor.h` | The motor interface: a throttle from -1, full reverse, to 1, full forward |

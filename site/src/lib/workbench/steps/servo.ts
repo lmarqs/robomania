@@ -32,7 +32,7 @@ export type ServoEvent =
 
 export type ServoStep = StepDefinition<ServoState, ServoEvent>;
 
-/** The GPIO the sketches' `BoardPwmOutPin servoPin(SERVO_PIN, 50);` drives on an ESP32. */
+/** The GPIO the sketches' `BoardPwmOutPin servoPin(BOARD_SERVO_PIN, 50);` drives on an ESP32. */
 export const SERVO_PIN = 13;
 /** The servo's range, `PositionalServo`'s default. */
 export const MAX_ANGLE = 180;

@@ -58,12 +58,12 @@ line the board is about to run.
 
 ### 1. sweep: 0° to 180° and back
 
-A servo reads the *width* of a pulse it gets 50 times a second, every 20 ms. `BoardPwmOutPin servoPin(SERVO_PIN, 50)`
-asks the board for a 50 Hz signal: on an ESP32, the LEDC hardware sends it on GPIO 13 with 16 bits of resolution; on an
-Arduino Nano, Timer1 sends it on pin 9. `PositionalServo` turns an angle into
-a pulse width: 0° becomes 544 µs and 180° becomes 2400 µs, with the angles in between spread evenly. Two `for` loops
-walk the angle up and down, with `delay(15)` between degrees, and print `angle <n>` for each through `output`, the
-library's `SerialOutput`.
+A servo reads the *width* of a pulse it gets 50 times a second, every 20 ms.
+`BoardPwmOutPin servoPin(BOARD_SERVO_PIN, 50)` asks the board for a 50 Hz signal: on an ESP32, the LEDC hardware sends
+it on GPIO 13 with 16 bits of resolution; on an Arduino Nano, Timer1 sends it on pin 9. `PositionalServo` turns an
+angle into a pulse width: 0° becomes 544 µs and 180° becomes 2400 µs, with the angles in between spread evenly. Two
+`for` loops walk the angle up and down, with `delay(15)` between degrees, and print `angle <n>` for each through
+`output`, the library's `SerialOutput`.
 
 ### 2. angle: check the number
 
