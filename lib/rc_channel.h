@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "pulse_width.h"
+#include "pulse_range.h"
 
 /**
  * One channel of an RC receiver: the servo pulse width it sends, mapped to where the transmitter's stick, trigger or

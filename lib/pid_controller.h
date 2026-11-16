@@ -13,9 +13,9 @@ struct PidGains {
  */
 class PidController {
  private:
-  PidGains gains;
+  PidGains currentGains;
   float outMin, outMax;
-  float integral = 0.0f;
+  float accumulatedError = 0.0f;
   float previousMeasurement = 0.0f;
   bool hasPrevious = false;
 
@@ -23,18 +23,18 @@ class PidController {
   PidController(PidGains gains, float outMin, float outMax);
 
   void setGains(PidGains gains);
-  PidGains getGains() const;
+  PidGains gains() const;
   void setOutputLimits(float outMin, float outMax);
 
   /** Clears the integral and the derivative's history, such as when the loop is enabled again. */
   void reset();
 
   /**
-   * Advances one step of `dt` seconds and returns the clamped output. A `dt` of zero or less leaves the integral
+   * Advances one step of `dtS` seconds and returns the clamped output. A `dtS` of zero or less leaves the integral
    * as it is and gives the derivative no share of the output.
    */
-  float update(float setpoint, float measurement, float dt);
+  float update(float setpoint, float measurement, float dtS);
 
   /** The accumulated error, in error units × seconds. */
-  float getIntegral() const;
+  float integral() const;
 };

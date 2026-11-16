@@ -1,11 +1,11 @@
-#include "camera.h"
+#include "esp32_camera.h"
 
 #if defined(ESP32) && __has_include(<esp_camera.h>)
 #include <Arduino.h>
 #include <esp_camera.h>
 
 #define CAMERA_MODEL_AI_THINKER
-#include "camera_pins.h"
+#include "esp32_camera_pins.h"
 #include "esp32_ledc.h"
 #if ESP_ARDUINO_VERSION_MAJOR >= 3
 #include <esp32-hal-periman.h>
@@ -48,7 +48,7 @@ static bool reserveClock(camera_config_t& config) {
 static void releaseClock(const camera_config_t&) { ledcDetach(XCLK_GPIO_NUM); }
 #endif
 
-bool EspCamera::begin() {
+bool Esp32Camera::begin() {
   if (esp_camera_sensor_get()) {
     return true;
   }
@@ -120,7 +120,7 @@ bool EspCamera::begin() {
   return true;
 }
 
-void EspCamera::capture(EspCameraPictureReader reader) {
+void Esp32Camera::capture(Esp32CameraPictureReader reader) {
   camera_fb_t* fb = esp_camera_fb_get();
 
   if (!fb) {

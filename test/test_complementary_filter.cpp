@@ -7,7 +7,7 @@ void test_first_update_seeds_to_accel(void) {
   ComplementaryFilter f(0.98f);
   float a = f.update(/*accel_angle=*/12.5f, /*rate=*/1000.0f, /*dt=*/0.01f);
   TEST_ASSERT_FLOAT_WITHIN(1e-4f, 12.5f, a);
-  TEST_ASSERT_FLOAT_WITHIN(1e-4f, 12.5f, f.getAngle());
+  TEST_ASSERT_FLOAT_WITHIN(1e-4f, 12.5f, f.angle());
 }
 
 // alpha = 1 trusts the gyro completely: the estimate integrates rate * dt and
@@ -19,7 +19,7 @@ void test_alpha_one_is_pure_gyro_integration(void) {
     f.update(/*accel_angle=*/999.0f, /*rate=*/10.0f, /*dt=*/0.1f);
   }
   // 10 deg/s for 10 * 0.1 s = 10 deg, regardless of the accel input.
-  TEST_ASSERT_FLOAT_WITHIN(1e-3f, 10.0f, f.getAngle());
+  TEST_ASSERT_FLOAT_WITHIN(1e-3f, 10.0f, f.angle());
 }
 
 // alpha = 0 trusts the accelerometer completely: the estimate tracks the accel
@@ -39,7 +39,7 @@ void test_accel_corrects_drift(void) {
   for (int i = 0; i < 100; ++i) {
     f.update(/*accel_angle=*/0.0f, /*rate=*/0.0f, /*dt=*/0.01f);
   }
-  TEST_ASSERT_FLOAT_WITHIN(0.1f, 0.0f, f.getAngle());
+  TEST_ASSERT_FLOAT_WITHIN(0.1f, 0.0f, f.angle());
 }
 
 int main(int, char**) {

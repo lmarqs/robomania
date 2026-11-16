@@ -35,7 +35,7 @@ void test_anti_windup(void) {
   PidController pid({0.0f, 1.0f, 0.0f}, -1.0f, 1.0f);
   for (int i = 0; i < 1000; ++i) pid.update(/*sp=*/100.0f, /*meas=*/0.0f, 0.1f);
   // Integral contribution is capped at out_max/ki = 1.0, not the ~10000 raw sum.
-  TEST_ASSERT_FLOAT_WITHIN(1e-3f, 1.0f, pid.getIntegral());
+  TEST_ASSERT_FLOAT_WITHIN(1e-3f, 1.0f, pid.integral());
   // One step with the error reversed drops the output below the limit at once.
   TEST_ASSERT_TRUE(pid.update(/*sp=*/0.0f, /*meas=*/100.0f, 0.1f) < 1.0f);
 }
@@ -62,9 +62,9 @@ void test_derivative_on_rising_measurement(void) {
 void test_reset_clears_integral(void) {
   PidController pid({0.0f, 1.0f, 0.0f}, -100.0f, 100.0f);
   pid.update(1.0f, 0.0f, 1.0f);
-  TEST_ASSERT_TRUE(pid.getIntegral() > 0.0f);
+  TEST_ASSERT_TRUE(pid.integral() > 0.0f);
   pid.reset();
-  TEST_ASSERT_FLOAT_WITHIN(1e-6f, 0.0f, pid.getIntegral());
+  TEST_ASSERT_FLOAT_WITHIN(1e-6f, 0.0f, pid.integral());
 }
 
 int main(int, char**) {

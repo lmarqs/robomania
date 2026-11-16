@@ -3,8 +3,8 @@
 #include <Wire.h>
 #include <board_pwm_out_pin.h>
 #include <esc_motor.h>
-#include <imu.h>
-#include <serial_io.h>
+#include <mpu6050_imu.h>
+#include <serial_input.h>
 
 #include "./balancer.h"
 #include "./config.h"
@@ -80,9 +80,9 @@ static void step(float dt) {
 
   // The beam pivots around the sensor's Z axis: level, gravity lies on +X, and tilting swings it into Y. The Z rate
   // is negated to agree in sign with that angle. Both depend on how the sensor is mounted.
-  const float accelAngle = atan2f(sample.ay, sample.ax) * RAD_TO_DEG - settings.angleOffsetDeg;
+  const float accelAngle = atan2f(sample.ayG, sample.axG) * RAD_TO_DEG - settings.angleOffsetDeg;
   balancer.setGains(gains);
-  last = balancer.step({accelAngle, -sample.gz, setpoint, dt, enabled});
+  last = balancer.step({accelAngle, -sample.gzDps, setpoint, dt, enabled});
 
   esc1.write(last.active ? last.m1 : 0.0f);
   esc2.write(last.active ? last.m2 : 0.0f);
@@ -94,8 +94,8 @@ static void step(float dt) {
   static uint8_t n = 0;
   if (++n >= 20) {
     n = 0;
-    log_d("ax=%+.3f ay=%+.3f az=%+.3f | gx=%+.2f gy=%+.2f gz=%+.2f | acc=%+.1f fused=%+.1f", sample.ax, sample.ay,
-          sample.az, sample.gx, sample.gy, sample.gz, accelAngle, last.angle);
+    log_d("ax=%+.3f ay=%+.3f az=%+.3f | gx=%+.2f gy=%+.2f gz=%+.2f | acc=%+.1f fused=%+.1f", sample.axG, sample.ayG,
+          sample.azG, sample.gxDps, sample.gyDps, sample.gzDps, accelAngle, last.angle);
     log_d("control: core=%d stack_free=%u words", xPortGetCoreID(), uxTaskGetStackHighWaterMark(nullptr));
   }
 #endif

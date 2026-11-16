@@ -1,20 +1,19 @@
 #include "complementary_filter.h"
 
-ComplementaryFilter::ComplementaryFilter(float alpha) { this->alpha = alpha; }
+ComplementaryFilter::ComplementaryFilter(float alpha) : alpha(alpha) {}
 
 void ComplementaryFilter::reset(float angle) {
-  this->angle = angle;
+  estimate = angle;
   seeded = true;
 }
 
-float ComplementaryFilter::update(float absoluteAngle, float rate, float dt) {
+float ComplementaryFilter::update(float absoluteAngle, float rate, float dtS) {
   if (!seeded) {
     reset(absoluteAngle);
-    return angle;
+    return estimate;
   }
-
-  angle = alpha * (angle + rate * dt) + (1.0f - alpha) * absoluteAngle;
-  return angle;
+  estimate = alpha * (estimate + rate * dtS) + (1.0f - alpha) * absoluteAngle;
+  return estimate;
 }
 
-float ComplementaryFilter::getAngle() const { return angle; }
+float ComplementaryFilter::angle() const { return estimate; }

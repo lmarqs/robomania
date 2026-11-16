@@ -3,12 +3,12 @@
 /**
  * Estimates one angle from two imperfect signals: an absolute angle that is noisy, such as the one an accelerometer
  * reads from gravity, and a rate that is smooth and drifts when integrated, such as a gyroscope's. Each update
- * computes `alpha × (angle + rate × dt) + (1 − alpha) × absoluteAngle`.
+ * computes `alpha × (angle + rate × dtS) + (1 − alpha) × absoluteAngle`.
  */
 class ComplementaryFilter {
  private:
   float alpha;
-  float angle = 0.0f;
+  float estimate = 0.0f;
   bool seeded = false;
 
  public:
@@ -20,9 +20,9 @@ class ComplementaryFilter {
 
   /**
    * Blends one sample and returns the new estimate, in the unit of `absoluteAngle`. `rate` is in that unit per
-   * second and `dt` in seconds. The first update, when reset() has not run, returns `absoluteAngle`.
+   * second and `dtS` in seconds. The first update, when reset() has not run, returns `absoluteAngle`.
    */
-  float update(float absoluteAngle, float rate, float dt);
+  float update(float absoluteAngle, float rate, float dtS);
 
-  float getAngle() const;
+  float angle() const;
 };

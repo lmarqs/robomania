@@ -8,32 +8,32 @@
 #endif
 #include <esp_http_server.h>
 
-using EspWebServerFrameHandler = std::function<void(httpd_ws_frame_t* frame)>;
-using EspWebServerBodyHandler = std::function<void(uint8_t* buf, size_t len)>;
+using Esp32WebServerFrameHandler = std::function<void(httpd_ws_frame_t* frame)>;
+using Esp32WebServerBodyHandler = std::function<void(uint8_t* buf, size_t len)>;
 
-class EspWebServerRequest {
+class Esp32WebServerRequest {
  private:
   httpd_req_t* req;
 
  public:
-  EspWebServerRequest(httpd_req_t* req);
+  Esp32WebServerRequest(httpd_req_t* req);
 
-  int getMethod();
+  int method();
 
-  esp_err_t frame(EspWebServerFrameHandler handler);
+  esp_err_t frame(Esp32WebServerFrameHandler handler);
 
-  esp_err_t body(EspWebServerBodyHandler handler);
+  esp_err_t body(Esp32WebServerBodyHandler handler);
 };
 
-class EspWebServerResponse {
+class Esp32WebServerResponse {
  private:
   httpd_req_t* req;
   esp_err_t err;
 
  public:
-  EspWebServerResponse(httpd_req_t* req);
+  Esp32WebServerResponse(httpd_req_t* req);
 
-  esp_err_t getErr();
+  esp_err_t error();
 
   void reset();
 
@@ -62,15 +62,16 @@ class EspWebServerResponse {
   void send(httpd_ws_frame_t* buf);
 };
 
-using EspWebServerHandler = std::function<void(EspWebServerRequest* req, EspWebServerResponse* res)>;
+using Esp32WebServerHandler = std::function<void(Esp32WebServerRequest* req, Esp32WebServerResponse* res)>;
 
-class EspWebServer {
+class Esp32WebServer {
  private:
   httpd_handle_t httpd = NULL;
 
  public:
-  void begin(int port);
+  /** Starts the server on `port`. Returns false when it cannot start, such as when the port is taken. */
+  bool begin(int port);
 
-  void on(char* uri, httpd_method_t method, EspWebServerHandler handler);
+  void on(const char* uri, httpd_method_t method, Esp32WebServerHandler handler);
 };
 #endif

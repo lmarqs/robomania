@@ -1,15 +1,15 @@
-#include "web_server.h"
+#include "esp32_web_server.h"
 
 #ifdef ESP32
 #include <Arduino.h>
 #include <FS.h>
 #include <esp_http_server.h>
 
-EspWebServerRequest::EspWebServerRequest(httpd_req_t* req) { this->req = req; }
+Esp32WebServerRequest::Esp32WebServerRequest(httpd_req_t* req) : req(req) {}
 
-int EspWebServerRequest::getMethod() { return req->method; }
+int Esp32WebServerRequest::method() { return req->method; }
 
-esp_err_t EspWebServerRequest::frame(EspWebServerFrameHandler handler) {
+esp_err_t Esp32WebServerRequest::frame(Esp32WebServerFrameHandler handler) {
   esp_err_t ret;
 
   httpd_ws_frame_t frame;
@@ -45,7 +45,7 @@ esp_err_t EspWebServerRequest::frame(EspWebServerFrameHandler handler) {
   return ret;
 }
 
-esp_err_t EspWebServerRequest::body(EspWebServerBodyHandler handler) {
+esp_err_t Esp32WebServerRequest::body(Esp32WebServerBodyHandler handler) {
   uint8_t* buf = (uint8_t*)calloc(1, req->content_len + 1);
 
   if (!buf) {
@@ -66,22 +66,19 @@ esp_err_t EspWebServerRequest::body(EspWebServerBodyHandler handler) {
 }
 
 
-EspWebServerResponse::EspWebServerResponse(httpd_req_t* req) {
-  this->req = req;
-  this->err = ESP_OK;
-}
+Esp32WebServerResponse::Esp32WebServerResponse(httpd_req_t* req) : req(req), err(ESP_OK) {}
 
-esp_err_t EspWebServerResponse::getErr() { return err; }
+esp_err_t Esp32WebServerResponse::error() { return err; }
 
-void EspWebServerResponse::reset() { err = ESP_OK; }
+void Esp32WebServerResponse::reset() { err = ESP_OK; }
 
-void EspWebServerResponse::fail() { err = ESP_FAIL; }
+void Esp32WebServerResponse::fail() { err = ESP_FAIL; }
 
-void EspWebServerResponse::fail(esp_err_t reason) { err = reason; }
+void Esp32WebServerResponse::fail(esp_err_t reason) { err = reason; }
 
-bool EspWebServerResponse::isConnected() { return err == ESP_OK; }
+bool Esp32WebServerResponse::isConnected() { return err == ESP_OK; }
 
-void EspWebServerResponse::setStatus(const char* status) {
+void Esp32WebServerResponse::setStatus(const char* status) {
   if (err != ESP_OK) {
     return;
   }
@@ -89,7 +86,7 @@ void EspWebServerResponse::setStatus(const char* status) {
   err = httpd_resp_set_status(req, status);
 }
 
-void EspWebServerResponse::setType(const char* type) {
+void Esp32WebServerResponse::setType(const char* type) {
   if (err != ESP_OK) {
     return;
   }
@@ -97,9 +94,9 @@ void EspWebServerResponse::setType(const char* type) {
   err = httpd_resp_set_type(req, type);
 }
 
-void EspWebServerResponse::setContentLength(size_t len) { req->content_len = len; }
+void Esp32WebServerResponse::setContentLength(size_t len) { req->content_len = len; }
 
-void EspWebServerResponse::setHeader(const char* key, const char* value) {
+void Esp32WebServerResponse::setHeader(const char* key, const char* value) {
   if (err != ESP_OK) {
     return;
   }
@@ -107,7 +104,7 @@ void EspWebServerResponse::setHeader(const char* key, const char* value) {
   err = httpd_resp_set_hdr(req, key, value);
 }
 
-void EspWebServerResponse::send(const char* status, const char* type, const uint8_t* buf, size_t len) {
+void Esp32WebServerResponse::send(const char* status, const char* type, const uint8_t* buf, size_t len) {
   this->setStatus(status);
 
   this->setType(type);
@@ -115,7 +112,7 @@ void EspWebServerResponse::send(const char* status, const char* type, const uint
   err = httpd_resp_send(req, (char*)buf, len);
 }
 
-void EspWebServerResponse::send(const char* status, const char* type, FS fs, const char* path) {
+void Esp32WebServerResponse::send(const char* status, const char* type, FS fs, const char* path) {
   this->setStatus(status);
 
   this->setType(type);
@@ -139,7 +136,7 @@ void EspWebServerResponse::send(const char* status, const char* type, FS fs, con
   file.close();
 }
 
-void EspWebServerResponse::send(const uint8_t* buf, size_t len) {
+void Esp32WebServerResponse::send(const uint8_t* buf, size_t len) {
   if (err != ESP_OK) {
     return;
   }
@@ -147,7 +144,7 @@ void EspWebServerResponse::send(const uint8_t* buf, size_t len) {
   err = httpd_resp_send_chunk(req, (char*)buf, len);
 }
 
-void EspWebServerResponse::send(const char* buf) {
+void Esp32WebServerResponse::send(const char* buf) {
   if (err != ESP_OK) {
     return;
   }
@@ -155,7 +152,7 @@ void EspWebServerResponse::send(const char* buf) {
   err = httpd_resp_send_chunk(req, buf, strlen(buf));
 }
 
-void EspWebServerResponse::send(httpd_ws_frame_t* frame) {
+void Esp32WebServerResponse::send(httpd_ws_frame_t* frame) {
   if (err != ESP_OK) {
     return;
   }
@@ -163,33 +160,33 @@ void EspWebServerResponse::send(httpd_ws_frame_t* frame) {
   err = httpd_ws_send_frame(req, frame);
 }
 
-void EspWebServer::begin(int port) {
+bool Esp32WebServer::begin(int port) {
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
   config.server_port = port;
   config.ctrl_port = 32000 + port;
 
-  httpd_start(&httpd, &config);
+  return httpd_start(&httpd, &config) == ESP_OK;
 }
 
-void EspWebServer::on(char* uri, httpd_method_t method, EspWebServerHandler handler) {
+void Esp32WebServer::on(const char* uri, httpd_method_t method, Esp32WebServerHandler handler) {
   httpd_uri_t config;
 
   config.uri = uri;
   config.method = method;
 
   config.handler = [](httpd_req_t* r) -> esp_err_t {
-    EspWebServerRequest req(r);
-    EspWebServerResponse res(r);
+    Esp32WebServerRequest req(r);
+    Esp32WebServerResponse res(r);
 
-    EspWebServerHandler* handler = static_cast<EspWebServerHandler*>(r->user_ctx);
+    Esp32WebServerHandler* handler = static_cast<Esp32WebServerHandler*>(r->user_ctx);
 
     (*handler)(&req, &res);
 
-    return res.getErr();
+    return res.error();
   };
 
-  config.user_ctx = new EspWebServerHandler(handler);
+  config.user_ctx = new Esp32WebServerHandler(handler);
 
   config.is_websocket = true;
 

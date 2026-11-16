@@ -6,9 +6,9 @@
 /** One reading of an accelerometer and gyroscope. */
 struct ImuSample {
   /** Acceleration on each axis, in g. */
-  float ax, ay, az;
+  float axG, ayG, azG;
   /** Angular rate around each axis, in degrees per second. */
-  float gx, gy, gz;
+  float gxDps, gyDps, gzDps;
 };
 
 /**
@@ -19,7 +19,7 @@ class Mpu6050Imu {
  private:
   TwoWire* wire;
   uint8_t address;
-  float gxBias = 0.0f, gyBias = 0.0f, gzBias = 0.0f;
+  float gxBiasDps = 0.0f, gyBiasDps = 0.0f, gzBiasDps = 0.0f;
 
   bool writeRegister(uint8_t reg, uint8_t value);
   bool readRaw(int16_t raw[6]);

@@ -1,7 +1,8 @@
 #include <Arduino.h>
-#include <board.h>
 #include <board_digital_out_pin.h>
-#include <serial_io.h>
+#include <board_led.h>
+#include <serial_input.h>
+#include <serial_output.h>
 
 BoardDigitalOutPin led(BOARD_LED_PIN, BOARD_LED_ON);
 SerialInput input;

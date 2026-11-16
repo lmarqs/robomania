@@ -1,4 +1,4 @@
-#include "imu.h"
+#include "mpu6050_imu.h"
 
 const uint8_t REG_SMPLRT_DIV = 0x19;
 const uint8_t REG_CONFIG = 0x1A;
@@ -12,10 +12,7 @@ const float GYRO_LSB_PER_DPS = 131.0f;
 
 const uint16_t BIAS_SAMPLES = 500;
 
-Mpu6050Imu::Mpu6050Imu(TwoWire* wire, uint8_t address) {
-  this->wire = wire;
-  this->address = address;
-}
+Mpu6050Imu::Mpu6050Imu(TwoWire* wire, uint8_t address) : wire(wire), address(address) {}
 
 bool Mpu6050Imu::writeRegister(uint8_t reg, uint8_t value) {
   wire->beginTransmission(address);
@@ -74,9 +71,9 @@ bool Mpu6050Imu::begin() {
     delay(2);
   }
   if (taken > 0) {
-    gxBias = sums[0] / taken / GYRO_LSB_PER_DPS;
-    gyBias = sums[1] / taken / GYRO_LSB_PER_DPS;
-    gzBias = sums[2] / taken / GYRO_LSB_PER_DPS;
+    gxBiasDps = sums[0] / taken / GYRO_LSB_PER_DPS;
+    gyBiasDps = sums[1] / taken / GYRO_LSB_PER_DPS;
+    gzBiasDps = sums[2] / taken / GYRO_LSB_PER_DPS;
   }
   return true;
 }
@@ -87,11 +84,11 @@ bool Mpu6050Imu::read(ImuSample& sample) {
     return false;
   }
 
-  sample.ax = raw[0] / ACCEL_LSB_PER_G;
-  sample.ay = raw[1] / ACCEL_LSB_PER_G;
-  sample.az = raw[2] / ACCEL_LSB_PER_G;
-  sample.gx = raw[3] / GYRO_LSB_PER_DPS - gxBias;
-  sample.gy = raw[4] / GYRO_LSB_PER_DPS - gyBias;
-  sample.gz = raw[5] / GYRO_LSB_PER_DPS - gzBias;
+  sample.axG = raw[0] / ACCEL_LSB_PER_G;
+  sample.ayG = raw[1] / ACCEL_LSB_PER_G;
+  sample.azG = raw[2] / ACCEL_LSB_PER_G;
+  sample.gxDps = raw[3] / GYRO_LSB_PER_DPS - gxBiasDps;
+  sample.gyDps = raw[4] / GYRO_LSB_PER_DPS - gyBiasDps;
+  sample.gzDps = raw[5] / GYRO_LSB_PER_DPS - gzBiasDps;
   return true;
 }

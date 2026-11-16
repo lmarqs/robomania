@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "pulse_width.h"
+#include "pulse_range.h"
 #include "pwm_out_pin.h"
 
 /**

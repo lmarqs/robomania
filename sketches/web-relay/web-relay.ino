@@ -1,9 +1,10 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 #include <EEPROM.h>
-#include <board.h>
 #include <board_digital_out_pin.h>
-#include <serial_io.h>
+#include <board_led.h>
+#include <serial_input.h>
+#include <serial_output.h>
 
 #if defined(ESP8266)
 #include <ESP8266WebServer.h>

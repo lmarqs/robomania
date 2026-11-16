@@ -1,18 +1,9 @@
-#include "pulse_width.h"
+#include "pulse_range.h"
 
 // Written so a NaN fails both comparisons and comes out as `low`, never as a NaN cast to an integer.
 static float clamp(float value, float low, float high) { return value >= low ? (value <= high ? value : high) : low; }
 
-uint16_t pulseDuty(float pulseUs, uint32_t frequencyHz) {
-  const float duty = pulseUs * frequencyHz / 1000000.0f * PwmOutPin::DUTY_MAX;
-  return (uint16_t)(clamp(duty, 0.0f, PwmOutPin::DUTY_MAX) + 0.5f);
-}
-
-PulseRange::PulseRange(float lowUs, float centerUs, float highUs) {
-  this->lowUs = lowUs;
-  this->centerUs = centerUs;
-  this->highUs = highUs;
-}
+PulseRange::PulseRange(float lowUs, float centerUs, float highUs) : lowUs(lowUs), centerUs(centerUs), highUs(highUs) {}
 
 PulseRange PulseRange::linear(float lowUs, float highUs) { return PulseRange(lowUs, (lowUs + highUs) / 2.0f, highUs); }
 

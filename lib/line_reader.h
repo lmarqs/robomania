@@ -11,14 +11,14 @@ class LineReader {
   /** The longest line kept, with its terminator. */
   static const size_t CAPACITY = 128;
 
-  LineReader() { buffer_[0] = '\0'; }
+  LineReader() { buffer[0] = '\0'; }
 
   /** Takes one byte. Returns true when it ended a line, which line() holds until the next call. */
   bool feed(char c);
-  const char* line() const { return buffer_; }
+  const char* line() const { return buffer; }
 
  private:
-  char buffer_[CAPACITY];
-  size_t length_ = 0;
-  bool ready_ = false;
+  char buffer[CAPACITY];
+  size_t length = 0;
+  bool ready = false;
 };

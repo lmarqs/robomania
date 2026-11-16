@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <board.h>
 #include <board_digital_out_pin.h>
+#include <board_led.h>
 #include <board_pwm_out_pin.h>
-#include <imu.h>
+#include <mpu6050_imu.h>
 #include <pulse_out.h>
 #include <reversible_esc_motor.h>
 #include <steering_assist.h>
@@ -69,7 +69,7 @@ static float yawRateDps() {
   if (!read) {
     return 0.0f;
   }
-  return DRIFT_GYRO_REVERSED ? -sample.gz : sample.gz;
+  return DRIFT_GYRO_REVERSED ? -sample.gzDps : sample.gzDps;
 }
 
 /**
