@@ -14,7 +14,7 @@ works in its own unit:
 
 | Layer | Sending a pulse | Reading a pulse |
 | --- | --- | --- |
-| Position, from -1 to 1 | `PulseOut`, inside `EscMotor`, `ReversibleEscMotor` and the servos | `RcChannel` |
+| Position, from -1 to 1 | `PulseOut`, inside `PulseMotor` and `PositionalServo` | `RcChannel` |
 | Pulse, in µs | `PulseRange::pulseUs()` | `PulseRange::position()` |
 | Pin, in the hardware's unit | `PwmOutPin`: a duty | `PulseInPin`: a width in µs |
 
@@ -40,15 +40,15 @@ into a pulse; reading, it turns a pulse back into a position, with the same arit
 middle scales on its own, so a steering servo whose straight-ahead pulse sits off the middle still reaches both
 locks, and a range given from high to low reverses the travel.
 
-The two ESC drivers are the same `PulseOut` with a different middle:
+An ESC is a `PulseMotor`, and its range says which kind:
 
-| Driver | Low, middle, high | Throttle 0 sends |
+| ESC | Range | Throttle 0 sends |
 | --- | --- | --- |
-| `EscMotor`, one way | 1000, 1000, 2000 µs | 1000 µs: stopped |
-| `ReversibleEscMotor`, an RC car's | 1000, 1500, 2000 µs | 1500 µs: neutral |
+| One way | `PulseRange::oneWay(1000, 2000)`: 1000, 1000, 2000 µs | 1000 µs: stopped |
+| An RC car's, which reverses | `PulseRange(1000, 1500, 2000)` | 1500 µs: neutral |
 
-Swap them and an RC car reverses at full power when told to stop, or a one-way motor runs at half throttle. That is
-why each keeps its own name, though the code under both is one.
+Swap them and an RC car reverses at full power when told to stop, or a one-way motor runs at half throttle, so a
+sketch spells out the range its ESC needs.
 
 ## How the files are named
 

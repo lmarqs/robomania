@@ -2,8 +2,8 @@
 #include <Preferences.h>
 #include <Wire.h>
 #include <board_pwm_out_pin.h>
-#include <esc_motor.h>
 #include <mpu6050_imu.h>
+#include <pulse_motor.h>
 #include <serial_input.h>
 
 #include "./balancer.h"
@@ -23,8 +23,8 @@ const uint32_t CONTROL_STACK_BYTES = 8192;
 
 static BoardPwmOutPin escPin1(ESC_1_PIN, ESC_HZ);
 static BoardPwmOutPin escPin2(ESC_2_PIN, ESC_HZ);
-static EscMotor esc1(&escPin1);
-static EscMotor esc2(&escPin2);
+static PulseMotor esc1(&escPin1, PulseRange::oneWay(1000, 2000));
+static PulseMotor esc2(&escPin2, PulseRange::oneWay(1000, 2000));
 static Mpu6050Imu imu(&Wire);
 // Rebuilt in setup() from the settings, which the board reads from flash. Until then it holds a band of 0.
 static Balancer balancer(ComplementaryFilter(FILTER_ALPHA), PidController({KP, KI, KD}, 0.0f, 0.0f),

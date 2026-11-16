@@ -18,6 +18,12 @@ class PulseRange {
   static PulseRange linear(float lowUs, float highUs);
 
   /**
+   * A range for something that runs one way only, such as a one-way ESC: position 0 is `lowUs`, 1 is `highUs`, and a
+   * position below 0 stays at `lowUs`.
+   */
+  static PulseRange oneWay(float lowUs, float highUs);
+
+  /**
    * The pulse, in microseconds, for `position` from -1 at `lowUs` through 0 at `centerUs` to 1 at `highUs`, each side
    * scaled on its own. A position past either end is clamped to it, and a NaN one gives `centerUs`.
    */

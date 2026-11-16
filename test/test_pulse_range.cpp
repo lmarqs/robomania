@@ -28,8 +28,9 @@ void test_reversed_range_maps_position_one_to_the_shorter_pulse(void) {
   TEST_ASSERT_FLOAT_WITHIN(1e-3f, 1750.0f, reversed.pulseUs(-0.5f));
 }
 
-void test_range_with_low_at_center_runs_one_way(void) {
-  PulseRange forwardOnly(1000.0f, 1000.0f, 2000.0f);
+void test_one_way_range_starts_at_its_low_pulse_and_stays_there_below_zero(void) {
+  PulseRange forwardOnly = PulseRange::oneWay(1000.0f, 2000.0f);
+  TEST_ASSERT_FLOAT_WITHIN(1e-3f, 1000.0f, forwardOnly.pulseUs(0.0f));
   TEST_ASSERT_FLOAT_WITHIN(1e-3f, 1250.0f, forwardOnly.pulseUs(0.25f));
   TEST_ASSERT_FLOAT_WITHIN(1e-3f, 1000.0f, forwardOnly.pulseUs(-1.0f));
 }
@@ -77,7 +78,7 @@ int main(int, char**) {
   RUN_TEST(test_range_scales_each_side_on_its_own);
   RUN_TEST(test_range_clamps_a_position_past_either_end);
   RUN_TEST(test_reversed_range_maps_position_one_to_the_shorter_pulse);
-  RUN_TEST(test_range_with_low_at_center_runs_one_way);
+  RUN_TEST(test_one_way_range_starts_at_its_low_pulse_and_stays_there_below_zero);
   RUN_TEST(test_range_maps_a_nan_position_to_its_center);
   RUN_TEST(test_position_is_the_inverse_of_pulse);
   RUN_TEST(test_position_scales_each_side_on_its_own);

@@ -7,7 +7,7 @@
 
 /**
  * A servo-style pulse on a PWM pin, set by a position from -1 to 1: the one path from a position to a pulse to a duty
- * that EscMotor, ReversibleEscMotor, PositionalServo and ContinuousServoMotor share. It converts in microseconds, so
+ * that PulseMotor and PositionalServo share. It converts in microseconds, so
  * the pulse moves in steps as fine as the pin's duty allows, such as 0.3 µs on a 16-bit pin at 50 Hz.
  */
 class PulseOut {

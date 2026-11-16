@@ -4,8 +4,8 @@
 #include <board_led.h>
 #include <board_pwm_out_pin.h>
 #include <mpu6050_imu.h>
+#include <pulse_motor.h>
 #include <pulse_out.h>
-#include <reversible_esc_motor.h>
 #include <steering_assist.h>
 
 #include "./config.h"
@@ -26,7 +26,7 @@ static BoardPwmOutPin steeringPin(STEERING_PIN, 50);
 static BoardPwmOutPin escPin(ESC_PIN, 50);
 static PulseOut steering(&steeringPin,
                          PulseRange(DRIFT_STEERING_LEFT_US, DRIFT_STEERING_CENTER_US, DRIFT_STEERING_RIGHT_US));
-static ReversibleEscMotor esc(&escPin);
+static PulseMotor esc(&escPin, PulseRange(1000, 1500, 2000));
 static Mpu6050Imu imu(&Wire);
 static SteeringAssist assist(DRIFT_FULL_LOCK_DPS);
 static BoardDigitalOutPin led(BOARD_LED_PIN, BOARD_LED_ON);
