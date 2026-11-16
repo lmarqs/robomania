@@ -106,7 +106,7 @@ describe('line references', () => {
   it('fails to resolve a line that the .ino no longer has', () => {
     const source = readStepSource(blinkInput.sketch);
     const dropSecondDelay = source.replace(/(delay\(blinkDelay\);\n)([\s\S]*?)delay\(blinkDelay\);\n/, '$1$2');
-    const renamed = source.replace('led.write(LOW);', 'led.write(0);');
+    const renamed = source.replace('led.write(false);', 'led.write(0);');
     const visited = visitedLines(blinkInput, ['300']);
 
     const unresolvedIn = (mutated: string) =>
@@ -117,7 +117,7 @@ describe('line references', () => {
 
     expect(unresolvedIn(source)).toEqual([]);
     expect(unresolvedIn(dropSecondDelay)).toEqual(['delay(blinkDelay);#2']);
-    expect(unresolvedIn(renamed)).toEqual(['led.write(LOW);#1']);
+    expect(unresolvedIn(renamed)).toEqual(['led.write(false);#1']);
   });
 });
 
@@ -204,10 +204,10 @@ describe('blink/simple', () => {
     }
     expect(lines).toEqual([
       'output.println("HIGH");',
-      'led.write(HIGH);',
+      'led.write(true);',
       'delay(1000);',
       'output.println("LOW");',
-      'led.write(LOW);',
+      'led.write(false);',
       'delay(1000);',
       'output.println("HIGH");',
     ]);
@@ -289,7 +289,7 @@ describe('blink/input', () => {
     expect(executed).toEqual([
       'delay(blinkDelay);',
       'output.println("LOW");',
-      'led.write(LOW);',
+      'led.write(false);',
       'delay(blinkDelay);',
       IF_AVAILABLE,
       'String line = input.take();',
@@ -517,7 +517,7 @@ describe('the LED pin', () => {
     [blinkSimple, 8],
     [blinkInput, 9],
   ])('%#: changes at the led.write line, not at the print before it', (step, lines) => {
-    expect(pinWrites(step, lines)).toEqual([`led.write(HIGH); ${LED_PIN} true`, `led.write(LOW); ${LED_PIN} false`]);
+    expect(pinWrites(step, lines)).toEqual([`led.write(true); ${LED_PIN} true`, `led.write(false); ${LED_PIN} false`]);
   });
 
   it.each([blinkTimer, blinkCommands])('$key: changes at led.write(ledOn), after the print', (step) => {
@@ -572,13 +572,13 @@ describe('the line a real board is on', () => {
   it.each([
     [blinkSimple, 'delay(1000);'],
     [blinkInput, 'delay(blinkDelay);'],
-  ])('$key: HIGH puts the arrow on the first delay after led.write(HIGH), LOW on the second', (step, wait) => {
+  ])('$key: HIGH puts the arrow on the first delay after led.write(true), LOW on the second', (step, wait) => {
     const high = placed(step, 'HIGH');
     const low = placed(step, 'LOW');
     expect(high).toBe(numberOf(step, wait, 1));
     expect(low).toBe(numberOf(step, wait, 2));
-    expect(high).toBe(numberOf(step, 'led.write(HIGH);')! + 1);
-    expect(low).toBe(numberOf(step, 'led.write(LOW);')! + 1);
+    expect(high).toBe(numberOf(step, 'led.write(true);')! + 1);
+    expect(low).toBe(numberOf(step, 'led.write(false);')! + 1);
   });
 
   it('places the arrow nowhere for a line other than HIGH or LOW', () => {

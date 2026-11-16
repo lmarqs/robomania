@@ -61,7 +61,7 @@ void test_write_clamps_a_position_past_either_end(void) {
   TEST_ASSERT_EQUAL(6554, pin.duty);
 }
 
-void test_write_sends_the_centre_pulse_for_a_nan_position(void) {
+void test_write_sends_the_center_pulse_for_a_nan_position(void) {
   FakePwmOutPin pin;
   PulseOut out(&pin, servoRange());
   out.begin();
@@ -83,7 +83,7 @@ int main(int, char**) {
   RUN_TEST(test_write_sends_the_duty_of_the_pulse_for_the_position);
   RUN_TEST(test_write_uses_the_frequency_the_pin_runs_at);
   RUN_TEST(test_write_clamps_a_position_past_either_end);
-  RUN_TEST(test_write_sends_the_centre_pulse_for_a_nan_position);
+  RUN_TEST(test_write_sends_the_center_pulse_for_a_nan_position);
   RUN_TEST(test_pulse_is_the_range_pulse_for_the_position);
   return UNITY_END();
 }

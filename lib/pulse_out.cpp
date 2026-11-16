@@ -11,7 +11,7 @@ void PulseOut::write(float position) {
   if (!ready) {
     return;
   }
-  pwm->write(pulseDuty(range.pulseUs(position), pwm->frequency()));
+  pwm->write(PwmOutPin::duty(range.pulseUs(position) * pwm->frequencyHz() / 1000000.0f));
 }
 
 float PulseOut::pulseUs(float position) const { return range.pulseUs(position); }

@@ -26,17 +26,17 @@ bool parseBlinkMode(const char* name, BlinkMode& out) {
   return true;
 }
 
-BlinkSetting blinkSettingFrom(const BlinkController& controller) {
-  return BlinkSetting{BlinkSetting::MAGIC, BlinkSetting::VERSION, static_cast<uint8_t>(controller.mode()),
-                      controller.period()};
+BlinkSetting blinkSettingFrom(const BlinkSchedule& schedule) {
+  return BlinkSetting{BlinkSetting::MAGIC, BlinkSetting::VERSION, static_cast<uint8_t>(schedule.mode()),
+                      schedule.period()};
 }
 
-bool applyBlinkSetting(const BlinkSetting& setting, BlinkController& controller) {
+bool applyBlinkSetting(const BlinkSetting& setting, BlinkSchedule& schedule) {
   const bool valid = setting.magic == BlinkSetting::MAGIC && setting.version == BlinkSetting::VERSION &&
                      setting.mode <= static_cast<uint8_t>(BlinkMode::BLINK);
   if (!valid) {
     return false;
   }
-  controller.restore(static_cast<BlinkMode>(setting.mode), setting.periodMs);
+  schedule.restore(static_cast<BlinkMode>(setting.mode), setting.periodMs);
   return true;
 }

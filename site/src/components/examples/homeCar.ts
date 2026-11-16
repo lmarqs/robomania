@@ -40,7 +40,7 @@ const STILL_LIFT_MS = 350;
 // The car's right wheel has its outer edge at 434 + x; the loose wheel, radius 12, rests at 520.
 const WHEEL_GAP = 520 - 434 - 14;
 
-/** Clamps a drag of the knob from the stick's centre to the stick's reach. */
+/** Clamps a drag of the knob from the stick's center to the stick's reach. */
 export function tiltStick(dx: number, dy: number): Tilt {
   const scale = Math.min(1, STICK_REACH / (Math.hypot(dx, dy) || 1));
   const x = dx * scale;

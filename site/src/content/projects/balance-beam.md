@@ -93,9 +93,9 @@ The loop starts with `kp` 0.002, `ki` 0 and `kd` 0.0008, in throttle per degree.
 Every 5 ms the control loop does four things:
 
 ```cpp
-const float accelAngle = atan2f(sample.ay, sample.ax) * RAD_TO_DEG - settings.angleOffsetDeg;
+const float accelAngle = atan2f(sample.ayG, sample.axG) * RAD_TO_DEG - settings.angleOffsetDeg;
 balancer.setGains(gains);
-last = balancer.step({accelAngle, -sample.gz, setpoint, dt, enabled});
+last = balancer.step({accelAngle, -sample.gzDps, setpoint, dt, enabled});
 
 esc1.write(last.active ? last.m1 : 0.0f);
 esc2.write(last.active ? last.m2 : 0.0f);

@@ -1,14 +1,18 @@
 #include <Arduino.h>
-#include <pulse_in_pin.h>
-#include <serial_io.h>
+#include <board_pulse_in_pin.h>
+#include <serial_output.h>
 
 #if __has_include("local.h")
 #include "local.h"
 #endif
 
-// The GPIO each receiver channel is wired to, channel 1 first.
+// The GPIO each receiver channel is wired to, channel 1 first. An Uno or Nano times pulses only on pins 2 and 3.
 #ifndef RC_RECEIVER_PINS
+#ifdef __AVR__
+#define RC_RECEIVER_PINS 2, 3
+#else
 #define RC_RECEIVER_PINS 5, 17, 16, 4, 2, 15
+#endif
 #endif
 
 const uint8_t PINS[] = {RC_RECEIVER_PINS};
@@ -17,13 +21,13 @@ const size_t CHANNELS = sizeof(PINS) / sizeof(PINS[0]);
 const uint32_t SIGNAL_TIMEOUT_US = 100000;
 const uint32_t PRINT_EVERY_MS = 100;
 
-static EspPulseInPin* inputs[CHANNELS];
+static BoardPulseInPin* inputs[CHANNELS];
 static SerialOutput output;
 
 void setup() {
   output.begin("rc-receiver");
   for (size_t i = 0; i < CHANNELS; i++) {
-    inputs[i] = new EspPulseInPin(PINS[i]);
+    inputs[i] = new BoardPulseInPin(PINS[i]);
     if (!inputs[i]->begin()) {
       output.printf("error gpio %u has no interrupt\n", PINS[i]);
     }
@@ -37,7 +41,7 @@ void loop() {
     if (widthUs == 0) {
       output.printf("ch%u - ", i + 1);
     } else {
-      output.printf("ch%u %u ", i + 1, widthUs);
+      output.printf("ch%u %lu ", i + 1, (unsigned long)widthUs);
     }
   }
   output.println();

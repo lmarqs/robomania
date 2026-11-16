@@ -12,13 +12,14 @@ layout, and the Done check in [AGENTS.md](../../AGENTS.md) enforces it.
   out of the one image that `lib/`, the core and Bluepad32 link into, where a second function of the same name fails
   the link.
 - A `lib/` header MUST NOT share its name with a header of the core or of a library a sketch uses. `lib/` is on the
-  include path, so its header takes the other's place: the camera driver's files became `camera*` so that none
-  would shadow `<esp_camera.h>`.
-- A file in `lib/` that builds only on ESP32 MUST be wrapped in `#ifdef ESP32`, as `lib/pwm_out_pin.h` is. `lib/` also
+  include path, so its header takes the other's place: the camera driver's files are `esp32_camera*` so that none
+  shadows `<esp_camera.h>`, and the LED's constants live in `board_led.h` because the AVR core ships a `board.h`.
+- A file in `lib/` that builds only on ESP32 MUST be wrapped in `#ifdef ESP32`, as `lib/esp32_ledc.h` is, and one that
+  needs a driver only some chips ship in `__has_include` of its header too, as `lib/esp32_camera.h` is. `lib/` also
   builds for other boards, and arduino-cli compiles every source of a library a sketch lists, so one unguarded
   ESP32-only file breaks the build for every other board.
-- A sketch that uses the serial port MUST open it at 115200 baud: `output.begin("<key>")` from `lib/serial_io.h` does,
-  and a sketch outside the workbench calls `Serial.begin(115200)`. `arduino:run` and
+- A sketch that uses the serial port MUST open it at 115200 baud: `output.begin("<key>")` from
+  `lib/serial_output.h` does, and a sketch outside the workbench calls `Serial.begin(115200)`. `arduino:run` and
   `arduino:monitor` open the monitor at 115200 unless told otherwise, and the website reads every board at its
   project's `flash.baud`, so one speed for all sketches means a monitor never shows garbage after switching sketch.
 - A comment SHOULD record only a reason the code cannot show, such as a hardware constraint. Nothing checks a
@@ -36,17 +37,24 @@ supported board, and that it lives in `lib/board_pwm_out_pin.h`.
 | Interface: pure virtual, no Arduino core | `<Thing>`: `DigitalOutPin`, `PwmOutPin`, `Motor` | `<thing>.h`, no `.cpp` |
 | Implementation on the Arduino API, for every supported board | `Board<Thing>`: `BoardPwmOutPin` | `board_<thing>.h` and `.cpp` |
 | Code that runs only on the ESP32 | `Esp32<Thing>`: `Esp32Camera`; functions `esp32<Verb>…()` | `esp32_<thing>.h`, wrapped in `#ifdef ESP32` |
-| Driver of a device that implements an interface | `<Device><Interface>`: `FullHBridgeMotor`, `EscMotor` | snake_case of the class |
+| Driver of a device that implements an interface | `<Signal><Interface>`: `PulseMotor`, `DirectionPwmMotor` | snake_case of the class |
 | Driver or logic with no interface | `<Qualifier><Thing>`: `Mpu6050Imu`, `RcChannel` | snake_case of the class |
 | Test double | `Fake<Interface>`: `FakePwmOutPin` | `test/fake_<thing>.h` |
 
+- A driver that implements an interface MUST be named after the signals it sends its device, such as `PulseMotor`'s
+  servo pulse or `PwmPairMotor`'s two PWM pins, and its doc comment MUST name the devices or chips it fits. Many
+  devices share one wiring, so the signal tells a sketch's author which class fits the hardware in hand.
 - A header MUST hold one public class, and besides it only the types its interface takes or returns, such as
   `ImuSample` beside `Mpu6050Imu`. One class per file makes the file name the index a reader searches by.
-- A `Board` class whose code differs per board MUST keep each board's part in `board_<thing>_<board>.cpp`
-  (`esp32`, `esp8266`, `avr`), guarded by that board's `#if`, so a reader studies one board's hardware in one file.
-- A supported board is the ESP32, the ESP8266 or the ATmega328P of an Uno or Nano. A `Board` class's `begin()` MUST
+- A `Board` class whose code differs per chip family MUST keep each chip family's part in `board_<thing>_<family>.cpp`
+  (`esp32`, `esp8266`, `avr`), guarded by that family's `#if`, so a reader studies one family's hardware in one file.
+- A supported board carries an ESP32, an ESP8266 or the ATmega328P of an Uno or Nano. A `Board` class's `begin()` MUST
   return false on a board, or a pin, that cannot do what was asked, rather than fail the build: arduino-cli compiles
   every source of the library into every sketch.
+- A value that depends on the board the sketch is built for, and that more than one sketch uses, MUST be a constant
+  named `BOARD_<THING>` in `board_<thing>.h`, such as `BOARD_LED_PIN` in `board_led.h`. A value only one class or
+  one sketch uses, such as the ADC's full scale in `board_analog_in_pin.cpp` or rc-receiver's default pins, stays in
+  that source, chosen with `#if` when only the value differs, so a reader sees every board's value side by side.
 - Every interface and every driver MUST start with `bool begin()`, which returns false when the hardware cannot run.
 - An interface MUST speak its hardware's unit, the same on every board: a digital pin a `bool`; `PwmOutPin` a duty
   from 0 to `DUTY_MAX`, 65535; `AnalogInPin` a value from 0 to `VALUE_MAX`, 65535, scaled from the board's ADC; and

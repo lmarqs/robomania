@@ -14,7 +14,7 @@ works in its own unit:
 
 | Layer | Sending a pulse | Reading a pulse |
 | --- | --- | --- |
-| Position, from -1 to 1 | `PulseOut`, inside `Esc`, `ReversibleEsc` and the servos | `RcChannel` |
+| Position, from -1 to 1 | `PulseOut`, inside `PulseMotor` and `PositionalServo` | `RcChannel` |
 | Pulse, in µs | `PulseRange::pulseUs()` | `PulseRange::position()` |
 | Pin, in the hardware's unit | `PwmOutPin`: a duty | `PulseInPin`: a width in µs |
 
@@ -24,7 +24,7 @@ The two pins look as if they should be twins, a `PwmOutPin` and a `PwmInPin`. Th
 works in a different unit on each side.
 
 - **Sending**: the ESP32's LEDC hardware repeats a square wave at a fixed frequency and takes a **duty**, how much of
-  each period stays high (see [PWM signals](../pwm/)). So the output pin speaks duty, and `pulseDuty()` converts the
+  each period stays high (see [PWM signals](../pwm/)). So the output pin speaks duty, and `PulseOut` converts the
   pulse a servo needs: 1500 µs of a 20 ms period is 7.5 %, or 4915 of 65535 steps.
 - **Reading**: an interrupt fires on each edge of the pin and notes the time. The gap between a rising and a falling
   edge is the pulse's **width**, already in µs. The input never measures a whole period, so it cannot report a duty,
@@ -40,23 +40,24 @@ into a pulse; reading, it turns a pulse back into a position, with the same arit
 middle scales on its own, so a steering servo whose straight-ahead pulse sits off the middle still reaches both
 locks, and a range given from high to low reverses the travel.
 
-The two ESC drivers are the same `PulseOut` with a different middle:
+An ESC is a `PulseMotor`, and its range says which kind:
 
-| Driver | Low, middle, high | Throttle 0 sends |
+| ESC | Range | Throttle 0 sends |
 | --- | --- | --- |
-| `Esc`, one way | 1000, 1000, 2000 µs | 1000 µs: stopped |
-| `ReversibleEsc`, an RC car's | 1000, 1500, 2000 µs | 1500 µs: neutral |
+| One way | `PulseRange::oneWay(1000, 2000)`: 1000, 1000, 2000 µs | 1000 µs: stopped |
+| An RC car's, which reverses | `PulseRange(1000, 1500, 2000)` | 1500 µs: neutral |
 
-Swap them and an RC car reverses at full power when told to stop, or a one-way motor runs at half throttle. That is
-why each keeps its own name, though the code under both is one.
+Swap them and an RC car reverses at full power when told to stop, or a one-way motor runs at half throttle, so a
+sketch spells out the range its ESC needs.
 
 ## How the files are named
 
-The interfaces live in `pin.h`, one per kind of pin: `InPin` and `OutPin` for a level, `PwmOutPin` and
-`PulseInPin`. They build without the Arduino core, so a test can hand a driver a fake pin and check the duty it
-writes, with no board.
+Each interface has a header of its own, one per kind of pin: `digital_in_pin.h` and `digital_out_pin.h` for a level,
+`analog_in_pin.h` for a voltage, `pwm_out_pin.h` and `pulse_in_pin.h`. They build without the Arduino core, so a test
+can hand a driver a fake pin and check the duty it writes, with no board.
 
-A file named `<kind>_pin` holds the classes that give that kind of pin on a board: `digital_pin`, `analog_pin`,
-`pwm_out_pin` and `pulse_in_pin`. A class is named for what the pin carries and which way it goes, with `Esp` in
-front when it runs only on the ESP32: `EspPwmOutPin` sends PWM through LEDC, and `EspPulseInPin` reads pulses by
-interrupt. The [Library](../../library/) page shows every header.
+The class a sketch creates puts `Board` in front of the interface it gives: `BoardPwmOutPin` sends PWM and
+`BoardPulseInPin` reads pulses on the board the sketch is built for, whether an ESP32, an ESP8266 or an Arduino Nano.
+Its file is the class name in lower case with underscores, `board_pwm_out_pin.h`, and where the boards differ, each
+board's code sits in a file of its own, such as `board_pwm_out_pin_avr.cpp`. A class that runs only on the ESP32
+starts with `Esp32` instead, such as `Esp32Camera`. The [Library](../../library/) page shows every header.

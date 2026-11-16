@@ -26,21 +26,26 @@ The firmware has five parts:
   a folder without one is searched a level down. A sketch says which device sits on which pin, and holds its robot's
   control logic. Its path under `sketches/` names it in the firmware manifest and its image folder.
 - **Pin interfaces**, in `lib/`: the kinds of pin a driver can ask for, in or out, each in the unit its hardware
-  works in: a level, a PWM duty out, or a pulse width in. The interfaces build without the Arduino core, so a test
-  can stand in a pin of its own; a file per kind of pin holds the classes that give it on a board.
-- **Drivers**, in `lib/`: one library that the ESP sketches build with. Each driver runs one sort of device, such as a
-  motor, a servo or a camera, serves one protocol, or does one control calculation, such as a PID controller. The
-  [README](../README.md#code-layout) lists them. The drivers that speak servo-style pulses, the servos and ESCs, share
+  works in: a level, a voltage in, a PWM duty out, or a pulse width in. The interfaces build without the Arduino core,
+  so a test can stand in a pin of its own. Each has a `Board` class that gives it on the board the sketch is built
+  for, the ESP32, the ESP8266 or an AVR such as the Nano, so a sketch names a pin and not a chip. The
+  [C++ sources](standards/cpp-sources.md) standard says how classes and files are named.
+- **Drivers**, in `lib/`: one library that every sketch but `usb-key` builds with. Each driver runs one sort of
+  device, such as a motor, a servo or a camera, serves one protocol, or does one control calculation, such as a PID
+  controller. The [README](../README.md#code-layout) lists them. Every motor driver, whether an H-bridge, an ESC or a
+  continuous servo, takes the same throttle from -1 to 1 through the `Motor` interface, so a robot can swap one for
+  another. The drivers that speak servo-style pulses, the servos and ESCs, share
   one path from a position to a pulse to a duty, and reading a receiver's pulse back to a position runs the same range
   the other way.
 - **Tests**, in `test/`: programs that run the drivers on the developer's machine, with no board. Automated tests
   cover only `lib/`: the drivers that compute without touching hardware, and those that reach the hardware only
   through a pin interface, run against a pin the test fakes. A sketch is checked by compiling it and by running it on
   its board.
-- **Core**: the Arduino core that each sketch's `sketch.yaml` pins for its board. The ESP32 sketches pin the
-  Bluepad32 ESP32 core, which gives the Arduino API, ESP-IDF and the Bluetooth gamepad stack. `sketches/web-relay`
-  pins the ESP8266 core for the ESP-01S and, in its `esp32` profile, the Bluepad32 core, and `sketches/usb-key` the
-  Digistump AVR core for the Digispark, which builds without `lib/`.
+- **Core**: the Arduino core that each sketch's `sketch.yaml` pins for its board. The sketches that read a Bluetooth
+  gamepad, `drift` and `omnidirectional`, pin the Bluepad32 ESP32 core, which adds the gamepad stack to the Arduino
+  API and ESP-IDF; the other ESP32 profiles pin Espressif's ESP32 core 3. The ESP-01S profiles pin the ESP8266 core,
+  the `nano` profiles the Arduino AVR core, and `sketches/usb-key` the Digistump AVR core for the Digispark, which
+  builds without `lib/`. `lib/` builds on both ESP32 cores: Bluepad32's is Espressif's core 2, whose LEDC API differs.
 
 ```mermaid
 flowchart TD
@@ -54,9 +59,9 @@ flowchart TD
 
 Dependencies point one way: sketches depend on drivers, pin interfaces and the core, and drivers on pin interfaces and
 the core; nothing in `lib/` depends on a sketch or on a test. Drivers reach the hardware only through the pin
-interfaces, so a driver runs on any pin that gives the output it needs, and a test runs it on a pin it fakes. A few
-drivers call ESP-IDF directly and build only for ESP32; the rest use only the Arduino API, and the ones under test use
-neither.
+interfaces, so a driver runs on any pin that gives the output it needs, and a test runs it on a pin it fakes. The
+`Esp32` classes call ESP-IDF directly and build only for ESP32; the `Board` classes use the Arduino API, with one file
+per board where the boards differ, and the drivers under test use neither.
 
 A sketch takes the values that differ from one build of its robot to the next, such as a password or a throttle
 range, from a `local.h` in its folder. Git ignores the file, so a secret stays out of the history, and a sketch

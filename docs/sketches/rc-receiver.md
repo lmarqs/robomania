@@ -6,7 +6,7 @@ keywords: RC receiver, PWM, pulse width, channel
 # RC receiver
 
 `sketches/rc-receiver` reads the servo pulses of a PWM RC receiver's channels and prints their widths, so moving one
-stick at a time shows which channel arrives on which pin, where its ends and centre sit, and whether the receiver
+stick at a time shows which channel arrives on which pin, where its ends and center sit, and whether the receiver
 holds its signal.
 
 ## Wiring
@@ -37,6 +37,6 @@ At 115200 baud, after `sketch rc-receiver`:
 | `error gpio <pin> has no interrupt` | At boot, for a pin that cannot time pulses. |
 | `ch1 <us> ch2 <us> …` | Every 100 ms: the last pulse width of each channel in µs, or `-` when none arrived in the last 100 ms. |
 
-A centred stick reads about 1500 µs and its ends about 1000 and 2000 µs; a transmitter's end points and trims move
+A centered stick reads about 1500 µs and its ends about 1000 and 2000 µs; a transmitter's end points and trims move
 them. A channel that shows `-` with the transmitter on is not wired, not bound, or is a channel the transmitter does
 not send.

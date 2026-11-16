@@ -1,20 +1,20 @@
 #include "line_reader.h"
 
 bool LineReader::feed(char c) {
-  if (ready_) {
-    length_ = 0;
-    ready_ = false;
+  if (ready) {
+    length = 0;
+    ready = false;
   }
   if (c == '\r' || c == '\n') {
-    if (length_ == 0) {
+    if (length == 0) {
       return false;
     }
-    buffer_[length_] = '\0';
-    ready_ = true;
+    buffer[length] = '\0';
+    ready = true;
     return true;
   }
-  if (length_ < CAPACITY - 1) {
-    buffer_[length_++] = c;
+  if (length < CAPACITY - 1) {
+    buffer[length++] = c;
   }
   return false;
 }

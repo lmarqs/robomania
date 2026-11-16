@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pin.h>
+#include <pwm_out_pin.h>
 
 /** Records what a driver asks of a PWM pin, running at whatever frequency the test sets. */
 class FakePwmOutPin : public PwmOutPin {
@@ -16,5 +16,5 @@ class FakePwmOutPin : public PwmOutPin {
     writes++;
     duty = value;
   }
-  uint32_t frequency() override { return hz; }
+  uint32_t frequencyHz() override { return hz; }
 };

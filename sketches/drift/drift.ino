@@ -1,10 +1,11 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <board_digital_out_pin.h>
 #include <board_led.h>
-#include <esc.h>
-#include <imu.h>
+#include <board_pwm_out_pin.h>
+#include <mpu6050_imu.h>
+#include <pulse_motor.h>
 #include <pulse_out.h>
-#include <pwm_out_pin.h>
 #include <steering_assist.h>
 
 #include "./config.h"
@@ -21,14 +22,14 @@ const uint8_t STATUS_IMU = 1 << 1;
 const uint8_t STATUS_ALL = STATUS_CONTROLLER | STATUS_IMU;
 
 // The servo and the ESC share one 50 Hz LEDC timer; 16 bits make a step of 0.3 µs at that rate.
-static EspPwmOutPin steeringPin(STEERING_PIN, 50, 16);
-static EspPwmOutPin escPin(ESC_PIN, 50, 16);
+static BoardPwmOutPin steeringPin(STEERING_PIN, 50);
+static BoardPwmOutPin escPin(ESC_PIN, 50);
 static PulseOut steering(&steeringPin,
                          PulseRange(DRIFT_STEERING_LEFT_US, DRIFT_STEERING_CENTER_US, DRIFT_STEERING_RIGHT_US));
-static ReversibleEsc esc(&escPin);
+static PulseMotor esc(&escPin, PulseRange(1000, 1500, 2000));
 static Mpu6050Imu imu(&Wire);
 static SteeringAssist assist(DRIFT_FULL_LOCK_DPS);
-static BoardLed led;
+static BoardDigitalOutPin led(BOARD_LED_PIN, BOARD_LED_ON);
 
 #if DRIFT_CONTROLLER == DRIFT_CONTROLLER_RECEIVER
 static ReceiverInput input(DRIFT_GAIN);
@@ -68,7 +69,7 @@ static float yawRateDps() {
   if (!read) {
     return 0.0f;
   }
-  return DRIFT_GYRO_REVERSED ? -sample.gz : sample.gz;
+  return DRIFT_GYRO_REVERSED ? -sample.gzDps : sample.gzDps;
 }
 
 /**
@@ -143,7 +144,7 @@ void loop() {
     drive(input.command());
   }
   if (DRIFT_STATUS_LED) {
-    led.write(statusLed(status, millis()) ? HIGH : LOW);
+    led.write(statusLed(status, millis()));
   }
   // Sleeps a tick so core 1's idle task runs; Bluepad32 delivers gamepad data far less often than this.
   delay(1);

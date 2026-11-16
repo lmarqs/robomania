@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "blink_controller.h"
+#include "blink_schedule.h"
 
 /** The name a mode has in the HTTP API and the page: "blink", "on" or "off". */
 const char* blinkModeName(BlinkMode mode);
@@ -22,7 +22,7 @@ struct BlinkSetting {
   static constexpr uint8_t VERSION = 1;
 };
 
-BlinkSetting blinkSettingFrom(const BlinkController& controller);
+BlinkSetting blinkSettingFrom(const BlinkSchedule& schedule);
 
-/** Applies a stored record when it is valid. Returns false, with the controller untouched, when it is not. */
-bool applyBlinkSetting(const BlinkSetting& setting, BlinkController& controller);
+/** Applies a stored record when it is valid. Returns false, with the schedule untouched, when it is not. */
+bool applyBlinkSetting(const BlinkSetting& setting, BlinkSchedule& schedule);

@@ -28,7 +28,7 @@ describe('the simulation', () => {
     expect(simulation.board.ledOn).toBe(false);
   });
 
-  it('runs the program on the simulated board: the LED lights once led.write(HIGH) has run', () => {
+  it('runs the program on the simulated board: the LED lights once led.write(true) has run', () => {
     const { simulation, clock, changed } = opened();
     clock.advance(500);
     expect(simulation.board.ledOn).toBe(true);

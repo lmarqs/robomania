@@ -5,7 +5,8 @@ audience: Whoever writes down a fact about the Robomania firmware, or looks for 
 # Docs
 
 `docs/` holds what the code and its history show nowhere else about the Robomania firmware. Building and flashing
-a sketch is in the [README](../README.md); what agents run and must not do is in [AGENTS.md](../AGENTS.md).
+a sketch is in the [README](../README.md); what agents run and must not do is in [AGENTS.md](../AGENTS.md). Every
+page uses the terms of the [glossary](glossary.md), one name per concept.
 
 ## Kinds
 
@@ -29,7 +30,7 @@ MUST, SHOULD and MAY. A practice that a check comes to enforce leaves the page, 
 The kind is the question a reader brings to a fact, not the fact's subject. Take the omnidirectional robot's
 motors: that sketches reach motors only through the drivers in `lib/` is architecture; that the robot stops when no
 command has come for 500 ms belongs on its sketch's page; that the LEDC pin driving them is wrapped in
-`#ifdef ESP32` follows a standard; how `CarPilot` turns a speed into a duty belongs in the code, on no page.
+`#ifdef ESP32` follows a standard; how `CarPilot` turns a wheel speed into a throttle belongs in the code, on no page.
 
 ## Misfilings
 

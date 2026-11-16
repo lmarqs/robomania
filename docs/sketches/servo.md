@@ -12,7 +12,7 @@ All four steps:
 
 - Take the servo's signal wire on GPIO 13.
 - Send pulses from 544 µs at 0° to 2400 µs at 180°.
-- Open the serial port with `output.begin("servo/<step>")` from `lib/serial_io.h`, which sets 115200 baud and prints
+- Open the serial port with `output.begin("servo/<step>")` from `lib/serial_output.h`, which sets 115200 baud and prints
   a blank line and `sketch servo/<step>`. The website reads that line to tell which step a connected board runs.
 - Print `angle <n>` each time they write an angle to the servo.
 

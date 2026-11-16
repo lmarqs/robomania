@@ -1,12 +1,13 @@
 # Robomania
 
-Firmware for a 1:10 RC car run by an ESP32, built with arduino-cli on the
-[Bluepad32](https://github.com/ricardoquesada/bluepad32) ESP32 core. The repository holds a library of drivers in
+Firmware for a 1:10 RC car run by an ESP32, built with arduino-cli: on the
+[Bluepad32](https://github.com/ricardoquesada/bluepad32) ESP32 core for the sketches that read a Bluetooth gamepad,
+and on Espressif's ESP32 core for the rest. The repository holds a library of drivers in
 `lib/` and the sketches that use it in `sketches/`. The car's own sketch is not written yet;
 [docs/sketches](docs/sketches/README.md) says what each sketch does, and `sketches/blink/simple` proves the toolchain
 works.
-Two sketches run on other boards, each on the core its `sketch.yaml` pins: `sketches/web-relay` on an ESP-01S and
-`sketches/usb-key` on a Digispark ATtiny85.
+Other boards run on the core each `sketch.yaml` pins: `sketches/web-relay` and the blink steps on an ESP-01S, the
+blink, servo and rc-receiver sketches also on an Arduino Nano, and `sketches/usb-key` on a Digispark ATtiny85.
 
 This README is for someone who knows Arduino basics and wants to build and flash a sketch. It covers the toolchain
 and the code layout; the chassis and its printed parts are in [Hardware](#hardware).
@@ -29,7 +30,7 @@ use. The first compile of a sketch also downloads its core into `.arduino/`. `mi
 A sketch with more than one board has a profile for each in its `sketch.yaml`, and the task builds the default one.
 Build another with `mise exec -- arduino-cli compile <sketch> --profile <profile>`.
 
-`mise run arduino:compile-all` builds every sketch's default profile and stops at the first that fails.
+`mise run arduino:compile-all` builds every profile of every sketch and stops at the first that fails.
 
 A sketch reads its passwords and the values of one build of its robot from `<sketch>/local.h`, which Git ignores;
 the sketch's page in [docs/sketches](docs/sketches/README.md) lists the names it reads.
@@ -93,30 +94,33 @@ The drivers in `lib/`:
 
 | Files | Drives |
 | --- | --- |
-| `pin.h` | The pin interfaces, free of the Arduino core: a level in or out, a PWM duty out, a pulse width in |
-| `digital_pin.*`, `analog_pin.*` | GPIO pins through the Arduino API |
-| `board_led.*` | The LED on the board the sketch is built for |
+| `digital_in_pin.h`, `digital_out_pin.h`, `analog_in_pin.h`, `pwm_out_pin.h`, `pulse_in_pin.h` | The pin interfaces, free of the Arduino core: a level in or out, a voltage in, a PWM duty out, a pulse width in |
+| `board_*_pin.*` | Each pin interface on the board the sketch is built for: the ESP32, the ESP8266 or an AVR such as the Nano |
+| `board_led.h` | The LED on the board the sketch is built for |
+| `board_servo_pin.h` | A pin that drives a servo on the board the sketch is built for |
 | `line_reader.*` | Serial bytes split into lines |
-| `serial_io.*` | The serial port as lines: read without waiting, printed with `Print` |
-| `pwm_out_pin.*` | A PWM output through the ESP32 LEDC peripheral, on a channel it allocates |
-| `h_bridge.*` | A motor through a full or half H-bridge |
-| `pulse_in_pin.*` | The width of the pulses a pin receives, such as an RC receiver channel's, timed by interrupt on an ESP32 |
+| `serial_input.*`, `serial_output.*` | The serial port as lines: read without waiting, printed with `Print` and `printf()` |
+| `motor.h` | The motor interface: a throttle from -1, full reverse, to 1, full forward |
+| `direction_pwm_motor.*`, `pwm_pair_motor.*` | A DC motor on an H-bridge: two direction pins and a PWM pin, or a pair of PWM pins |
+| `pulse_motor.*` | A motor driven by a servo-style pulse: an ESC, one way or reversible, or a continuous-rotation (360°) servo |
+| `pulse_width_meter.h` | The width of the last pulse from the edges an interrupt reports |
+| `positional_servo.*` | A positional servo, such as 0° to 180° |
 | `rc_channel.*` | An RC receiver channel's pulse width as a stick position or a knob level |
-| `pulse_width.*` | A pulse width as a PWM duty, and a position from -1 to 1 as a pulse between low, centre and high, and back |
+| `pulse_range.*` | A position from -1 to 1 as a pulse between low, center and high, and back |
 | `pulse_out.*` | A servo-style pulse on a PWM pin, set by a position from -1 to 1, that the ESC and servo drivers share |
-| `servo.*` | A positional (180°) or continuous-rotation (360°) hobby servo on a PWM pin |
-| `esc.*` | A motor through its electronic speed controller on a PWM pin: a forward-only brushless one, or an RC car's that also reverses |
-| `imu.*` | An MPU6050 accelerometer and gyroscope on I2C |
+| `mpu6050_imu.*` | An MPU6050 accelerometer and gyroscope on I2C |
 | `complementary_filter.*` | One steady angle out of an accelerometer's and a gyroscope's readings |
 | `pid_controller.*` | A PID controller |
 | `steering_assist.*` | Counter-steer against a car's yaw rate, as an RC drift gyro adds |
-| `camera*` | The camera of an AI Thinker ESP32-CAM |
-| `web_server.*` | An HTTP and WebSocket server on the ESP-IDF `httpd` |
+| `esp32_ledc.*` | The LEDC channels and timers the PWM pins and the camera share on the ESP32's core 2 |
+| `esp32_camera*` | The camera of an AI Thinker ESP32-CAM |
+| `esp32_web_server.*` | An HTTP and WebSocket server on the ESP-IDF `httpd` |
 
 Another sketch uses the drivers through the Robomania library: download `robomania-<version>.zip` from a
 [`lib-v` release](https://github.com/lmarqs/robomania/releases) and install it with
 `ARDUINO_LIBRARY_ENABLE_UNSAFE_INSTALL=true arduino-cli lib install --zip-path robomania-<version>.zip`, or in the
-Arduino IDE with Sketch > Include Library > Add .ZIP Library. It builds for ESP boards.
+Arduino IDE with Sketch > Include Library > Add .ZIP Library. It builds for the ESP32, the ESP8266 and AVR boards
+such as the Uno and Nano; each `board_*_pin.h` says what its pin can do on each.
 
 [docs/](docs/README.md) explains [how the parts fit](docs/architecture.md) and the [standards](docs/standards/README.md)
 the code follows. `.clang-format` sets the layout; apply it with `mise exec -- clang-format -i <file>`.

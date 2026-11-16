@@ -34,7 +34,7 @@ const uint8_t STEERING_PIN = DRIFT_STEERING_PIN;
 const uint8_t I2C_SDA_PIN = DRIFT_I2C_SDA_PIN;
 const uint8_t I2C_SCL_PIN = DRIFT_I2C_SCL_PIN;
 
-// The servo's pulses at full left, centre and full right. A car's steering stops short of the servo's own travel, so
+// The servo's pulses at full left, center and full right. A car's steering stops short of the servo's own travel, so
 // these come from the car: too wide a range stalls the servo against the stops.
 #ifndef DRIFT_STEERING_LEFT_US
 #define DRIFT_STEERING_LEFT_US 1000
@@ -54,8 +54,8 @@ const uint8_t I2C_SCL_PIN = DRIFT_I2C_SCL_PIN;
 #define DRIFT_RECEIVER_STEERING_PIN 5
 #endif
 
-// The receiver's pulses at one end, the centre and the other end of every channel, and the dead zone around the
-// centre. A transmitter's end points, trims and channel reverse set the channel to match.
+// The receiver's pulses at one end, the center and the other end of every channel, and the dead zone around the
+// center. A transmitter's end points, trims and channel reverse set the channel to match.
 #ifndef DRIFT_RECEIVER_LOW_US
 #define DRIFT_RECEIVER_LOW_US 1000
 #endif

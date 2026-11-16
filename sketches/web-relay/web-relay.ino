@@ -1,9 +1,10 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 #include <EEPROM.h>
+#include <board_digital_out_pin.h>
 #include <board_led.h>
-#include <digital_pin.h>
-#include <serial_io.h>
+#include <serial_input.h>
+#include <serial_output.h>
 
 #if defined(ESP8266)
 #include <ESP8266WebServer.h>
@@ -15,7 +16,7 @@ using HttpServer = ESP8266WebServer;
 using HttpServer = WebServer;
 #endif
 
-#include "./blink_controller.h"
+#include "./blink_schedule.h"
 #include "./blink_setting.h"
 #include "./blink_setting_update.h"
 #include "./config_command.h"
@@ -38,12 +39,12 @@ using HttpServer = WebServer;
 
 #if defined(ESP8266)
 // ESP-01S: GPIO0 drives the relay and is a boot strap, where LOW at reset enters flash mode.
-static DigitalOutPin relay(0, LOW);
+static BoardDigitalOutPin relay(0, LOW);
 #elif defined(ESP32)
 // ESP32 DevKit: GPIO23 stays LOW at boot, so the relay does not click during reset or flashing.
-static DigitalOutPin relay(23, HIGH);
+static BoardDigitalOutPin relay(23, HIGH);
 #endif
-static BoardLed led;
+static BoardDigitalOutPin led(BOARD_LED_PIN, BOARD_LED_ON);
 
 // The blink setting sits at 0 and the serial settings after it, with room left for a record to grow.
 static const size_t EEPROM_SIZE = 256;
@@ -55,7 +56,7 @@ static_assert(CONFIG_OFFSET + sizeof(StoredConfig) <= EEPROM_SIZE, "the serial s
 
 static const ConfigDefaults CONFIG_DEFAULTS{WEB_RELAY_AP_SSID, WEB_RELAY_AP_PASSWORD, WEB_RELAY_OTA_PASSWORD};
 
-static BlinkController blinker;
+static BlinkSchedule blinker;
 static StoredConfig config = emptyConfig();
 static SerialInput serialInput;
 static SerialOutput serialOutput;

@@ -24,7 +24,7 @@ export type BlinkEvent =
 
 export type BlinkStep = StepDefinition<BlinkState, BlinkEvent>;
 
-/** The GPIO the sketches' `DigitalOutPin led(2);` drives. */
+/** The GPIO the sketches' `BoardDigitalOutPin led(BOARD_LED_PIN, BOARD_LED_ON);` drives on an ESP32. */
 export const LED_PIN = 2;
 
 const DEFAULT_DELAY = 1000;
@@ -51,13 +51,13 @@ const simple: Sketch<BlinkState> = {
     yield* setup(board, 'blink/simple');
     for (;;) {
       yield op('output.println("HIGH");', () => board.print('HIGH'));
-      yield op('led.write(HIGH);', () => {
+      yield op('led.write(true);', () => {
         state.ledOn = true;
         board.write(LED_PIN, true);
       });
       yield waitOp('delay(1000);', DEFAULT_DELAY);
       yield op('output.println("LOW");', () => board.print('LOW'));
-      yield op('led.write(LOW);', () => {
+      yield op('led.write(false);', () => {
         state.ledOn = false;
         board.write(LED_PIN, false);
       });
@@ -86,13 +86,13 @@ const input: Sketch<BlinkState> = {
         }
       }
       yield op('output.println("HIGH");', () => board.print('HIGH'));
-      yield op('led.write(HIGH);', () => {
+      yield op('led.write(true);', () => {
         state.ledOn = true;
         board.write(LED_PIN, true);
       });
       yield waitOp('delay(blinkDelay);', () => state.blinkDelay);
       yield op('output.println("LOW");', () => board.print('LOW'));
-      yield op('led.write(LOW);', () => {
+      yield op('led.write(false);', () => {
         state.ledOn = false;
         board.write(LED_PIN, false);
       });

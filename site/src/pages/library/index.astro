@@ -4,27 +4,38 @@ import Base from '../../layouts/Base.astro';
 // The headers are read from the repository's lib/ at build time, so this page always shows the current code.
 const headers = import.meta.glob<string>('../../../../lib/*.h', { query: '?raw', import: 'default', eager: true });
 const purpose: Record<string, string> = {
-  'pin.h': 'The kinds of pin a driver can ask for, each in the unit its hardware works in: a level in or out, a PWM duty out, or a pulse width in.',
-  'digital_pin.h': 'A GPIO pin turned on or off through the Arduino API, active high or low.',
-  'board_led.h': 'The LED on the board the sketch is built for, lit HIGH on an ESP32 and LOW on an ESP8266.',
-  'analog_pin.h': 'A pin read with analogRead or written with analogWrite, through the Arduino API.',
-  'pwm_out_pin.h': 'A PWM output through the ESP32 LEDC peripheral, on a channel it allocates.',
-  'pulse_in_pin.h': "The width of the pulses a pin receives, such as an RC receiver channel's, timed by interrupt on an ESP32.",
-  'h_bridge.h': 'A motor through a full or half H-bridge.',
-  'esc.h': 'An electronic speed controller driven by pulse width on a PWM pin: forward-only for a brushless motor, or reversible for an RC car.',
-  'imu.h': 'An MPU6050 accelerometer and gyroscope on an I2C bus, read in g and degrees per second.',
+  'digital_in_pin.h': 'The interface of a pin read as on or off.',
+  'digital_out_pin.h': 'The interface of a pin that turns its load on or off.',
+  'analog_in_pin.h': "The interface of a pin that reads a voltage, scaled to 0 to 65535 whatever the board's ADC.",
+  'pwm_out_pin.h': 'The interface of a pin that outputs PWM: a duty from 0 to 65535 at a fixed frequency.',
+  'pulse_in_pin.h': "The interface of a pin that times the pulses it receives, such as an RC receiver channel's.",
+  'motor.h': 'The interface of a motor driven by a throttle from -1, full reverse, to 1, full forward.',
+  'board_digital_in_pin.h': 'A digital input on the board the sketch is built for, with its pinMode and active level.',
+  'board_digital_out_pin.h': 'A digital output on the board the sketch is built for, active high or low.',
+  'board_analog_in_pin.h': 'An analog input on the board the sketch is built for, through analogRead.',
+  'board_pwm_out_pin.h': "A PWM output on the board the sketch is built for: at analogWrite's rate, or at a frequency of its own, such as a servo's 50 Hz.",
+  'board_pulse_in_pin.h': 'A pulse input on the board the sketch is built for, timed by an interrupt on each edge.',
+  'board_led.h': 'The pin of the LED on the board the sketch is built for, and the level that lights it.',
+  'board_servo_pin.h': 'A pin that drives a servo at 50 Hz on the board the sketch is built for: 9 on a Nano, 13 on an ESP.',
+  'direction_pwm_motor.h': 'A DC motor on an L298N H-bridge, or a chip wired like it: two direction pins and a PWM enable pin.',
+  'pwm_pair_motor.h': 'A DC motor on a DRV8833 H-bridge, or a chip wired like it, such as the L9110S: one PWM pin per direction.',
+  'pulse_motor.h': 'A motor driven by a servo-style pulse: a one-way or reversible ESC, or a continuous-rotation (360°) servo.',
+  'pulse_width_meter.h': 'The width of the last pulse, from the edges a pin interrupt reports, on any board.',
+  'positional_servo.h': 'A positional servo that holds the angle each pulse width encodes, such as from 0° to 180°.',
+  'mpu6050_imu.h': 'An MPU6050 accelerometer and gyroscope on an I2C bus, read in g and degrees per second.',
   'complementary_filter.h': 'One angle from a noisy absolute angle and a drifting rate, such as an accelerometer and a gyroscope give.',
   'pid_controller.h': 'A discrete PID controller whose output, and the integral in it, stay within limits.',
   'steering_assist.h': "Counter-steer against a car's yaw rate, added to the driver's steering, as an RC drift gyro does.",
-  'pulse_width.h': 'A pulse width as a PWM duty, and a position from -1 to 1 as a pulse between low, centre and high, and back.',
-  'pulse_out.h': 'A servo-style pulse on a PWM pin, set by a position from -1 to 1, that the ESC and servo drivers share.',
+  'pulse_range.h': 'A position from -1 to 1 as a pulse between low, center and high, and back.',
+  'pulse_out.h': 'A servo-style pulse on a PWM pin, set by a position from -1 to 1, that PulseMotor and PositionalServo share.',
   'rc_channel.h': "An RC receiver channel's pulse width as a stick position or a knob level.",
-  'servo.h': 'A positional (180°) or continuous-rotation (360°) hobby servo on a PWM pin.',
   'line_reader.h': 'Bytes split into lines, the way SerialInput reads the serial port.',
-  'serial_io.h': 'The serial port as lines: SerialInput reads them without waiting, SerialOutput prints them.',
-  'camera.h': 'The camera of an AI Thinker ESP32-CAM.',
-  'camera_pins.h': 'The pins the AI Thinker ESP32-CAM wires its camera to.',
-  'web_server.h': 'An HTTP and WebSocket server on the ESP-IDF httpd.',
+  'serial_input.h': 'The lines the serial port receives, read without waiting.',
+  'serial_output.h': 'Printing to the serial port, with printf() on every board.',
+  'esp32_ledc.h': "The LEDC channels and timers BoardPwmOutPin and the camera share on the ESP32's core 2.",
+  'esp32_camera.h': 'The camera of an AI Thinker ESP32-CAM.',
+  'esp32_camera_pins.h': 'The pins the AI Thinker ESP32-CAM wires its camera to.',
+  'esp32_web_server.h': 'An HTTP and WebSocket server on the ESP-IDF httpd.',
 };
 const files = Object.entries(headers)
   .map(([path, source]) => ({ name: path.split('/').pop()!, source }))
@@ -52,7 +63,8 @@ const zipUrl = `${github}/releases/download/lib-v${version}/${zip}`;
     <h2 id="download">Download</h2>
     <p class="prose">
       <a href={zipUrl}>Download {zip}</a> to use the library in your own sketches. In the Arduino IDE: Sketch &gt;
-      Include Library &gt; Add .ZIP Library. The library is for ESP boards.
+      Include Library &gt; Add .ZIP Library. The library is for the ESP32, the ESP8266 and the Arduino Uno and
+      Nano.
     </p>
   </section>
   {

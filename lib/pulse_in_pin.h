@@ -1,28 +1,15 @@
 #pragma once
 
-#ifdef ESP32
-#include <Arduino.h>
-
-#include "pin.h"
+#include <stdint.h>
 
 /**
- * A pulse input on an ESP32 GPIO, timed by an interrupt on each edge, so reading it never waits for a pulse. The pin
- * is pulled down, so a loose wire gives no pulses instead of noise.
+ * A pin that times the high pulses it receives, such as an RC receiver channel's. It reports a width, not a duty: it
+ * does not know the period, and a servo-style signal carries its meaning in the width alone.
  */
-class EspPulseInPin : public PulseInPin {
- private:
-  uint8_t pin;
-  portMUX_TYPE lock = portMUX_INITIALIZER_UNLOCKED;
-  bool high = false;
-  uint32_t lastEdgeUs = 0;
-  uint32_t widthUs = 0;
-  uint32_t endUs = 0;
-
-  static void onEdge(void* self);
-
+class PulseInPin {
  public:
-  explicit EspPulseInPin(uint8_t pin);
-  bool begin() override;
-  uint32_t read(uint32_t maxAgeUs) override;
+  /** Returns false when the pin cannot run, such as when it has no interrupt. */
+  virtual bool begin() = 0;
+  /** The width, in microseconds, of the last high pulse if it ended within the last `maxAgeUs`; otherwise 0. */
+  virtual uint32_t read(uint32_t maxAgeUs) = 0;
 };
-#endif

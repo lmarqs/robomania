@@ -66,7 +66,7 @@ repository wants to hear about it.
 
 The sketch keeps three things apart: deciding what the lamp does, talking to the phone, and driving the pins.
 
-**Deciding.** `BlinkController` holds the mode and the period, and is told the time on every pass of `loop()`:
+**Deciding.** `BlinkSchedule` holds the mode and the period, and is told the time on every pass of `loop()`:
 
 ```cpp
 static void tick() {
@@ -78,7 +78,7 @@ static void tick() {
 }
 ```
 
-`update()` returns true only when the lamp should change, so the relay is written only then. The controller never
+`update()` returns true only when the lamp should change, so the relay is written only then. `BlinkSchedule` never
 reads a clock or touches a pin itself: it is handed the time and answers on or off.
 
 **Talking.** The board's web server answers four addresses: `/` sends the page, `/status` reports the mode, the

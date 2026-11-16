@@ -16,11 +16,11 @@ test.describe('the Library page download', () => {
     );
   });
 
-  test('says how to add the zip in the Arduino IDE and that the library is for ESP boards', async ({ page }) => {
+  test('says how to add the zip in the Arduino IDE and which boards the library is for', async ({ page }) => {
     await page.goto('/robomania/library/');
 
     const download = page.getByRole('region', { name: 'Download' });
     await expect(download).toContainText('In the Arduino IDE: Sketch > Include Library > Add .ZIP Library.');
-    await expect(download).toContainText('for ESP boards');
+    await expect(download).toContainText('for the ESP32, the ESP8266 and the Arduino Uno and Nano');
   });
 });

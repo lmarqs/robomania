@@ -1,20 +1,19 @@
 #include <Arduino.h>
 #include <Preferences.h>
 #include <Wire.h>
-#include <esc.h>
-#include <imu.h>
-#include <pwm_out_pin.h>
-#include <serial_io.h>
+#include <board_pwm_out_pin.h>
+#include <mpu6050_imu.h>
+#include <pulse_motor.h>
+#include <serial_input.h>
 
 #include "./balancer.h"
 #include "./config.h"
 #include "./config_command.h"
 #include "./tuning_server.h"
 
-// 14 bits is the finest LEDC resolution the ESP32-C3 has, and at 200 Hz one step of it is 0.3 µs. The ESCs take
-// a fresh pulse on every step of the 200 Hz control loop.
+// The ESCs take a fresh pulse on every step of the 200 Hz control loop. BoardPwmOutPin runs them at 16 bits on an
+// ESP32 and at 14, the C3's finest, on a C3: one step is 0.08 µs or 0.3 µs of the 5 ms period.
 const uint32_t ESC_HZ = 200;
-const uint8_t ESC_RESOLUTION = 14;
 const uint32_t ESC_ARM_MS = 3000;
 
 // Above the HTTP server's priority of 5, so control preempts it on the single-core C3, and below lwIP's 18 and
@@ -22,10 +21,10 @@ const uint32_t ESC_ARM_MS = 3000;
 const UBaseType_t CONTROL_PRIORITY = 10;
 const uint32_t CONTROL_STACK_BYTES = 8192;
 
-static EspPwmOutPin escPin1(ESC_1_PIN, ESC_HZ, ESC_RESOLUTION);
-static EspPwmOutPin escPin2(ESC_2_PIN, ESC_HZ, ESC_RESOLUTION);
-static Esc esc1(&escPin1);
-static Esc esc2(&escPin2);
+static BoardPwmOutPin escPin1(ESC_1_PIN, ESC_HZ);
+static BoardPwmOutPin escPin2(ESC_2_PIN, ESC_HZ);
+static PulseMotor esc1(&escPin1, PulseRange::oneWay(1000, 2000));
+static PulseMotor esc2(&escPin2, PulseRange::oneWay(1000, 2000));
 static Mpu6050Imu imu(&Wire);
 // Rebuilt in setup() from the settings, which the board reads from flash. Until then it holds a band of 0.
 static Balancer balancer(ComplementaryFilter(FILTER_ALPHA), PidController({KP, KI, KD}, 0.0f, 0.0f),
@@ -81,9 +80,9 @@ static void step(float dt) {
 
   // The beam pivots around the sensor's Z axis: level, gravity lies on +X, and tilting swings it into Y. The Z rate
   // is negated to agree in sign with that angle. Both depend on how the sensor is mounted.
-  const float accelAngle = atan2f(sample.ay, sample.ax) * RAD_TO_DEG - settings.angleOffsetDeg;
+  const float accelAngle = atan2f(sample.ayG, sample.axG) * RAD_TO_DEG - settings.angleOffsetDeg;
   balancer.setGains(gains);
-  last = balancer.step({accelAngle, -sample.gz, setpoint, dt, enabled});
+  last = balancer.step({accelAngle, -sample.gzDps, setpoint, dt, enabled});
 
   esc1.write(last.active ? last.m1 : 0.0f);
   esc2.write(last.active ? last.m2 : 0.0f);
@@ -95,8 +94,8 @@ static void step(float dt) {
   static uint8_t n = 0;
   if (++n >= 20) {
     n = 0;
-    log_d("ax=%+.3f ay=%+.3f az=%+.3f | gx=%+.2f gy=%+.2f gz=%+.2f | acc=%+.1f fused=%+.1f", sample.ax, sample.ay,
-          sample.az, sample.gx, sample.gy, sample.gz, accelAngle, last.angle);
+    log_d("ax=%+.3f ay=%+.3f az=%+.3f | gx=%+.2f gy=%+.2f gz=%+.2f | acc=%+.1f fused=%+.1f", sample.axG, sample.ayG,
+          sample.azG, sample.gxDps, sample.gyDps, sample.gzDps, accelAngle, last.angle);
     log_d("control: core=%d stack_free=%u words", xPortGetCoreID(), uxTaskGetStackHighWaterMark(nullptr));
   }
 #endif

@@ -24,20 +24,23 @@ to ground through the switches, called shoot-through, and it destroys them.
 
 ## In the project's code
 
-Real H-bridges come as driver chips with transistors for switches. The project's `FullHBridge` driver uses three pins
-for each motor: two direction pins and one PWM pin for speed.
+Real H-bridges come as chips, with transistors for switches, and the library names each motor driver after the
+signals it sends. `DirectionPwmMotor`, for an L298N, uses three pins for each motor: two direction pins and one PWM
+pin that sets how hard the motor turns. `PwmPairMotor`, for a DRV8833, uses two PWM pins, one for each direction. Like
+every motor in the library, both take a throttle from -1, full reverse, to 1, full forward. The table shows the
+L298N's pins.
 
 | | IN1 | IN2 | PWM |
 | --- | --- | --- | --- |
-| `forward(value)` | high | low | `value` |
-| `backward(value)` | low | high | `value` |
-| `stop()` | low | low | 0 |
+| `write(throttle)`, throttle above 0 | high | low | the throttle's share of full duty |
+| `write(throttle)`, throttle below 0 | low | high | the throttle's share of full duty, without its sign |
+| `write(0)` | low | low | 0 |
 
 What both direction pins low does, brake or coast, depends on the chip; its datasheet says. The driver's header is
-on the [Library](../../library/#h_bridge.h) page.
+on the [Library](../../library/#direction_pwm_motor.h) page.
 
 <div class="gap">
 
-The driver chips this project has been used with, and how they are wired to the ESP32.
+The H-bridge chips this project has been used with, and how they are wired to the ESP32.
 
 </div>

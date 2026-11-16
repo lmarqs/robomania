@@ -39,7 +39,7 @@ describe('codeRows', () => {
 
 describe('codeRows live values', () => {
   const source = [
-    'DigitalOutPin led(2);',
+    'BoardDigitalOutPin led(BOARD_LED_PIN, BOARD_LED_ON);',
     'int blinkDelay = 1000;',
     'bool ledOn = false;',
     'unsigned long lastToggle = 0;',
