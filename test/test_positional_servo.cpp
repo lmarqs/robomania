@@ -1,4 +1,5 @@
 #include <host_test.h>
+#include <math.h>
 #include <positional_servo.h>
 
 #include "fake_pwm_out_pin.h"
@@ -43,6 +44,25 @@ void test_positional_servo_scales_to_its_range(void) {
   TEST_ASSERT_FLOAT_WITHIN(1e-3f, 1500.0f, servo.pulseUs(135.0f));
 }
 
+void test_positional_servo_holds_its_last_pulse_on_a_nan_angle(void) {
+  FakePwmOutPin pin;
+  PositionalServo servo(&pin);
+  servo.begin();
+  servo.write(90.0f);
+  int writes = pin.writes;
+  servo.write(NAN);
+  TEST_ASSERT_EQUAL(4823, pin.duty);
+  TEST_ASSERT_EQUAL(writes, pin.writes);
+}
+
+void test_positional_servo_stays_limp_on_a_nan_angle_before_the_first_write(void) {
+  FakePwmOutPin pin;
+  PositionalServo servo(&pin);
+  servo.begin();
+  servo.write(NAN);
+  TEST_ASSERT_EQUAL(0, pin.writes);
+}
+
 int main(int, char**) {
   UNITY_BEGIN();
   RUN_TEST(test_positional_servo_stays_limp_until_the_first_write);
@@ -50,5 +70,7 @@ int main(int, char**) {
   RUN_TEST(test_positional_servo_takes_a_fraction_of_a_degree);
   RUN_TEST(test_positional_servo_clamps_an_angle_past_its_range);
   RUN_TEST(test_positional_servo_scales_to_its_range);
+  RUN_TEST(test_positional_servo_holds_its_last_pulse_on_a_nan_angle);
+  RUN_TEST(test_positional_servo_stays_limp_on_a_nan_angle_before_the_first_write);
   return UNITY_END();
 }

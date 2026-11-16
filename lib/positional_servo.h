@@ -22,7 +22,7 @@ class PositionalServo {
   /** Starts the pin and sends nothing, so the servo stays limp until the first write(). */
   bool begin();
 
-  /** Turns to `angleDeg`, clamped to 0 to `rangeDeg`. */
+  /** Turns to `angleDeg`, clamped to 0 to `rangeDeg`. A NaN angle is ignored: the servo holds its last pulse. */
   void write(float angleDeg);
 
   /** The pulse width, in microseconds, that write() sends for `angleDeg`. */
