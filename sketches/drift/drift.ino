@@ -2,10 +2,10 @@
 #include <Wire.h>
 #include <board.h>
 #include <board_digital_out_pin.h>
+#include <board_pwm_out_pin.h>
 #include <esc.h>
 #include <imu.h>
 #include <pulse_out.h>
-#include <board_pwm_out_pin.h>
 #include <steering_assist.h>
 
 #include "./config.h"

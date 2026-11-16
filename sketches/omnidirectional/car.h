@@ -2,8 +2,8 @@
 
 #include <Arduino.h>
 #include <board_digital_out_pin.h>
-#include <h_bridge.h>
 #include <board_pwm_out_pin.h>
+#include <h_bridge.h>
 
 #include "wheel_mixer.h"
 
