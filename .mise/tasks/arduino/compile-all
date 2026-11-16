@@ -12,11 +12,12 @@ fi
 for config in "${configs[@]}"; do
   sketch="$(dirname "${config}")"
   mise run arduino:compile "${sketch}"
-  default="$(yq '.default_profile' "${config}")"
+  default="$(yq '.default_profile // ""' "${config}")"
   for profile in $(yq '.profiles | keys | .[]' "${config}"); do
     if [[ "${profile}" != "${default}" ]]; then
       echo "== ${sketch} --profile ${profile}"
-      arduino-cli compile "${sketch}" --profile "${profile}" --build-path ".build/${sketch}/${profile}"
+      # Outside .build/sketches/, whose compile_commands.json files arduino:compile merges for the editor.
+      arduino-cli compile "${sketch}" --profile "${profile}" --build-path ".build/profiles/${sketch}/${profile}"
     fi
   done
 done

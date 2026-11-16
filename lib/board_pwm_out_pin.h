@@ -13,7 +13,7 @@
  * such as 50 Hz for a servo, it runs at that one:
  *
  * - ESP32: on any output pin, through the LEDC peripheral, at up to 16 bits.
- * - ESP8266: on any pin but GPIO16, through the core's waveform generator.
+ * - ESP8266: on GPIO0 to GPIO16 but the flash chip's GPIO6 to GPIO11, through the core's waveform generator.
  * - AVR: only on Timer1's pins, 9 and 10 on an Uno or Nano, which then share one frequency. begin() returns false on
  *   any other pin, or when the other Timer1 pin runs at another frequency or at analogWrite's rate.
  */

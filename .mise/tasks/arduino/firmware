@@ -98,7 +98,9 @@ def chip_family(arguments: list[str]) -> str:
 
 def flash_parts(arguments: list[str]) -> list[tuple[int, Path]]:
     """Pairs each `<offset> <file>` that follows the write command: esptool 4's write_flash or esptool 5's write-flash."""
-    command = next(argument for argument in arguments if argument in WRITE_COMMANDS)
+    command = next((argument for argument in arguments if argument in WRITE_COMMANDS), None)
+    if command is None:
+        raise SystemExit(f"the upload recipe writes with none of {', '.join(WRITE_COMMANDS)}: {shlex.join(arguments)}")
     tail = arguments[arguments.index(command) + 1 :]
     return [(int(offset, 16), Path(file)) for offset, file in itertools.pairwise(tail) if HEX_OFFSET.match(offset)]
 

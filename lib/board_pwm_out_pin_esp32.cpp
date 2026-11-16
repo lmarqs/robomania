@@ -52,8 +52,12 @@ bool BoardPwmOutPin::begin() {
   // ledcReadFreq() reads 0 while the duty is 0, so the timer the core picked is asked directly.
   const ledc_channel_handle_t* bus = (ledc_channel_handle_t*)perimanGetPinBus(pin, ESP32_BUS_TYPE_LEDC);
   actualHz = ledc_get_freq((ledc_mode_t)(bus->channel / SOC_LEDC_CHANNEL_NUM), (ledc_timer_t)bus->timer_num);
+  if (!actualHz) {
+    ledcDetach(pin);
+    return false;
+  }
 #endif
-  return actualHz != 0;
+  return true;
 }
 
 void BoardPwmOutPin::write(uint16_t duty) {

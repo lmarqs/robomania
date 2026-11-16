@@ -14,4 +14,8 @@ bool BoardAnalogInPin::begin() {
   return true;
 }
 
-uint16_t BoardAnalogInPin::read() { return (analogRead(pin) * (uint32_t)VALUE_MAX + ADC_MAX / 2) / ADC_MAX; }
+uint16_t BoardAnalogInPin::read() {
+  // The ESP8266's SDK documents its ADC as reading up to 1024, one past its 10 bits.
+  const uint32_t raw = analogRead(pin);
+  return ((raw < ADC_MAX ? raw : ADC_MAX) * (uint32_t)VALUE_MAX + ADC_MAX / 2) / ADC_MAX;
+}

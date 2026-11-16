@@ -11,8 +11,8 @@
 #include "./config_command.h"
 #include "./tuning_server.h"
 
-// 14 bits is the finest LEDC resolution the ESP32-C3 has, and at 200 Hz one step of it is 0.3 µs. The ESCs take
-// a fresh pulse on every step of the 200 Hz control loop.
+// The ESCs take a fresh pulse on every step of the 200 Hz control loop. BoardPwmOutPin runs them at 16 bits on an
+// ESP32 and at 14, the C3's finest, on a C3: one step is 0.08 µs or 0.3 µs of the 5 ms period.
 const uint32_t ESC_HZ = 200;
 const uint32_t ESC_ARM_MS = 3000;
 

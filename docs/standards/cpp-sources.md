@@ -48,8 +48,10 @@ supported board, and that it lives in `lib/board_pwm_out_pin.h`.
 - A supported board is the ESP32, the ESP8266 or the ATmega328P of an Uno or Nano. A `Board` class's `begin()` MUST
   return false on a board, or a pin, that cannot do what was asked, rather than fail the build: arduino-cli compiles
   every source of the library into every sketch.
-- A value that depends on the board the sketch is built for MUST be a constant named `BOARD_<THING>` in
-  `board_<thing>.h`, such as `BOARD_LED_PIN` in `board_led.h`.
+- A value that depends on the board the sketch is built for, and that a sketch uses, MUST be a constant named
+  `BOARD_<THING>` in `board_<thing>.h`, such as `BOARD_LED_PIN` in `board_led.h`. A value only one class uses, such
+  as the ADC's full scale in `board_analog_in_pin.cpp`, is a `static const` of its source, chosen with `#if` when
+  only the value differs, so a reader sees every board's value side by side.
 - Every interface and every driver MUST start with `bool begin()`, which returns false when the hardware cannot run.
 - An interface MUST speak its hardware's unit, the same on every board: a digital pin a `bool`; `PwmOutPin` a duty
   from 0 to `DUTY_MAX`, 65535; `AnalogInPin` a value from 0 to `VALUE_MAX`, 65535, scaled from the board's ADC; and
