@@ -52,10 +52,15 @@ esp_err_t Esp32WebServerRequest::body(Esp32WebServerBodyHandler handler) {
     return ESP_ERR_NO_MEM;
   }
 
-  int ret = httpd_req_recv(req, (char*)buf, req->content_len);
-
-  if (ret <= 0) {
-    return ESP_FAIL;
+  // httpd_req_recv() returns what has arrived so far, which can be less than the whole body.
+  size_t received = 0;
+  while (received < req->content_len) {
+    const int ret = httpd_req_recv(req, (char*)buf + received, req->content_len - received);
+    if (ret <= 0) {
+      free(buf);
+      return ESP_FAIL;
+    }
+    received += ret;
   }
 
   handler(buf, req->content_len);
