@@ -20,7 +20,7 @@ In the [omnidirectional robot](../../projects/omnidirectional/), each motor's PW
 and full speed is capped at an 80% duty cycle.
 
 A pin cannot power a motor by itself: it gives a few milliamps, and a motor wants far more. The pin's PWM signal
-goes to a driver, usually an [H-bridge](../h-bridge/), which switches the motor's own power supply.
+goes to a chip, usually an [H-bridge](../h-bridge/), which switches the motor's own power supply.
 
 <div class="gap">
 

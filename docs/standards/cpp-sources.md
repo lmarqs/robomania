@@ -43,9 +43,9 @@ supported board, and that it lives in `lib/board_pwm_out_pin.h`.
 
 - A header MUST hold one public class, and besides it only the types its interface takes or returns, such as
   `ImuSample` beside `Mpu6050Imu`. One class per file makes the file name the index a reader searches by.
-- A `Board` class whose code differs per board MUST keep each board's part in `board_<thing>_<board>.cpp`
-  (`esp32`, `esp8266`, `avr`), guarded by that board's `#if`, so a reader studies one board's hardware in one file.
-- A supported board is the ESP32, the ESP8266 or the ATmega328P of an Uno or Nano. A `Board` class's `begin()` MUST
+- A `Board` class whose code differs per chip family MUST keep each chip family's part in `board_<thing>_<family>.cpp`
+  (`esp32`, `esp8266`, `avr`), guarded by that family's `#if`, so a reader studies one family's hardware in one file.
+- A supported board carries an ESP32, an ESP8266 or the ATmega328P of an Uno or Nano. A `Board` class's `begin()` MUST
   return false on a board, or a pin, that cannot do what was asked, rather than fail the build: arduino-cli compiles
   every source of the library into every sketch.
 - A value that depends on the board the sketch is built for, and that more than one sketch uses, MUST be a constant

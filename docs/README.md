@@ -5,7 +5,8 @@ audience: Whoever writes down a fact about the Robomania firmware, or looks for 
 # Docs
 
 `docs/` holds what the code and its history show nowhere else about the Robomania firmware. Building and flashing
-a sketch is in the [README](../README.md); what agents run and must not do is in [AGENTS.md](../AGENTS.md).
+a sketch is in the [README](../README.md); what agents run and must not do is in [AGENTS.md](../AGENTS.md). Every
+page uses the terms of the [glossary](glossary.md), one name per concept.
 
 ## Kinds
 

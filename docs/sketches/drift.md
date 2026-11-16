@@ -8,7 +8,7 @@ keywords: gamepad, Bluepad32, RC receiver, PWM, servo, ESC, MPU6050, yaw rate, g
 The car that runs `sketches/drift` steers with a hobby servo and drives with a forward/reverse car ESC, both on 50 Hz
 pulses, from a Bluetooth gamepad or a PWM RC receiver, picked when the sketch is built. An MPU6050 measures how fast the car spins, and the sketch adds counter-steer
 against that spin, as an RC drift gyro does: when the tail swings out, the wheels turn into the slide, which damps the
-spin so the car holds the drift. The gyro acts on the steering only; the throttle stays with the driver.
+spin so the car holds the drift. The gyro acts on the steering only; the throttle stays with the person driving.
 
 ![The drift car's FreeRTOS tasks on each core, the peripherals they drive and the pins they use, with a gamepad](drift-architecture.svg)
 
