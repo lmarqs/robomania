@@ -5,16 +5,14 @@
 
 // The rate analogWrite() starts at in core 3.
 static const uint32_t ANALOG_WRITE_HZ = 1000;
-// GPIO16 is the last pin the waveform generator drives; it refuses GPIO6 to GPIO11, which the flash chip uses.
+// GPIO16 is the last pin the waveform generator drives; it also refuses the pins isFlashInterfacePin() names.
 static const uint8_t LAST_PIN = 16;
-static const uint8_t FIRST_FLASH_PIN = 6;
-static const uint8_t LAST_FLASH_PIN = 11;
 
 bool BoardPwmOutPin::begin() {
   if (actualHz) {
     return true;
   }
-  if (pin > LAST_PIN || (pin >= FIRST_FLASH_PIN && pin <= LAST_FLASH_PIN)) {
+  if (pin > LAST_PIN || isFlashInterfacePin(pin)) {
     return false;
   }
   const uint32_t hz = requestedHz ? requestedHz : ANALOG_WRITE_HZ;
