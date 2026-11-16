@@ -5,11 +5,12 @@
 #include <stdio.h>
 #endif
 
-void SerialOutput::begin(const char* name) {
+bool SerialOutput::begin(const char* name) {
   Serial.begin(115200);
   Serial.println();
   Serial.print("sketch ");
   Serial.println(name);
+  return true;
 }
 
 size_t SerialOutput::write(uint8_t c) { return Serial.write(c); }

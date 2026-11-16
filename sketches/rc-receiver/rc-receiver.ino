@@ -6,9 +6,13 @@
 #include "local.h"
 #endif
 
-// The GPIO each receiver channel is wired to, channel 1 first.
+// The GPIO each receiver channel is wired to, channel 1 first. An Uno or Nano times pulses only on pins 2 and 3.
 #ifndef RC_RECEIVER_PINS
+#ifdef __AVR__
+#define RC_RECEIVER_PINS 2, 3
+#else
 #define RC_RECEIVER_PINS 5, 17, 16, 4, 2, 15
+#endif
 #endif
 
 const uint8_t PINS[] = {RC_RECEIVER_PINS};
@@ -37,7 +41,7 @@ void loop() {
     if (widthUs == 0) {
       output.printf("ch%u - ", i + 1);
     } else {
-      output.printf("ch%u %u ", i + 1, widthUs);
+      output.printf("ch%u %lu ", i + 1, (unsigned long)widthUs);
     }
   }
   output.println();

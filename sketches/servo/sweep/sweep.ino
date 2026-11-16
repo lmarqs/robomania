@@ -3,7 +3,14 @@
 #include <positional_servo.h>
 #include <serial_output.h>
 
-BoardPwmOutPin servoPin(13, 50);
+// An Uno or Nano sets a PWM frequency only on Timer1's pins, 9 and 10.
+#ifdef __AVR__
+const uint8_t SERVO_PIN = 9;
+#else
+const uint8_t SERVO_PIN = 13;
+#endif
+
+BoardPwmOutPin servoPin(SERVO_PIN, 50);
 PositionalServo servo(&servoPin);
 SerialOutput output;
 

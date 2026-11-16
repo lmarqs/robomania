@@ -9,8 +9,11 @@
  */
 class SerialOutput : public Print {
  public:
-  /** Opens the port at 115200 baud, then prints a blank line and `sketch <name>`, which the website listens for. */
-  void begin(const char* name);
+  /**
+   * Opens the port at 115200 baud, then prints a blank line and `sketch <name>`, which the website listens for.
+   * Returns true: a board always has its serial port.
+   */
+  bool begin(const char* name);
   size_t write(uint8_t c) override;
   /** Waits until everything printed has left the port, such as before a restart. */
   void flush() override;
