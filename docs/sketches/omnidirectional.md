@@ -16,7 +16,7 @@ last command.
   about 12% of the travel, counts as zero: this dead zone keeps a stick at rest from creeping.
 - Pushing both sticks blends turning and moving, each in proportion to how far its stick is pushed: the left stick
   at half travel and the right at full give one third turning and two thirds moving.
-- A wheel at full speed drives its motor at an 80% PWM duty cycle.
+- A wheel's motor gets a throttle of 0.8 at most, four fifths of full duty.
 
 ## Inputs
 

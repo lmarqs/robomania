@@ -131,7 +131,7 @@
 
     <circle class="step" cx="896" cy="486" r="11"/><text class="steptext" x="892" y="490">6</text>
     <text class="mono" x="916" y="483">steering.write(steer)</text>
-    <text class="sm" x="916" y="499">PulseOut: −1…1 → left / centre / right µs from config.h</text>
+    <text class="sm" x="916" y="499">PulseOut: −1…1 → left / center / right µs from config.h</text>
 
     <circle class="step" cx="896" cy="530" r="11"/><text class="steptext" x="892" y="534">7</text>
     <text class="mono" x="916" y="527">led.write(); delay(1)</text>
@@ -151,7 +151,7 @@
   <text class="sm" x="322" y="532">On disconnect, the</text>
   <text class="sm" x="322" y="548">callback in step 1</text>
   <text class="sm" x="322" y="564">sends neutral throttle</text>
-  <text class="sm" x="322" y="580">and centre steering.</text>
+  <text class="sm" x="322" y="580">and center steering.</text>
   <text class="sm" x="322" y="600">A stalled link holds</text>
   <text class="sm" x="322" y="616">the last command until</text>
   <text class="sm" x="322" y="632">Bluepad32 notices.</text>

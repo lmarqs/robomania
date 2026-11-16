@@ -28,7 +28,7 @@ BoardDigitalOutPin in14(14);
 BoardDigitalOutPin in24(12);
 DirectionPwmMotor motor4(&pwm4, &in14, &in24);
 
-// The wheels run at four fifths of full speed at most.
+// A wheel's motor gets four fifths of full throttle at most.
 const float MAX_THROTTLE = 0.8f;
 
 class CarPilot {

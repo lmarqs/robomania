@@ -9,7 +9,7 @@ order: 1
 ---
 
 The ESP32's LEDC peripheral generates PWM signals in hardware: once set up, a signal keeps running while the CPU does
-other work. Each signal comes from a **channel**, and each channel counts on a **timer**, which sets the frequency
+other work. Each signal comes from an LEDC **channel**, and each channel counts on a **timer**, which sets the frequency
 and the resolution.
 
 The catch, in version 2 of the Arduino core for the ESP32: it drives channels in pairs, 2k and 2k + 1, from one timer,

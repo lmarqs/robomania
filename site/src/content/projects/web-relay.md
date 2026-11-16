@@ -78,7 +78,7 @@ static void tick() {
 }
 ```
 
-`update()` returns true only when the lamp should change, so the relay is written only then. The controller never
+`update()` returns true only when the lamp should change, so the relay is written only then. `BlinkController` never
 reads a clock or touches a pin itself: it is handed the time and answers on or off.
 
 **Talking.** The board's web server answers four addresses: `/` sends the page, `/status` reports the mode, the

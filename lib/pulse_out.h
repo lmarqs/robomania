@@ -22,7 +22,7 @@ class PulseOut {
   /** Starts the pin and sends nothing yet. Returns false when the pin cannot run; write() then does nothing. */
   bool begin();
 
-  /** Sends the pulse for `position`, from -1 at the range's low pulse through 0 at its centre to 1 at its high one. */
+  /** Sends the pulse for `position`, from -1 at the range's low pulse through 0 at its center to 1 at its high one. */
   void write(float position);
 
   /** The pulse width, in microseconds, that write() sends for `position`. */

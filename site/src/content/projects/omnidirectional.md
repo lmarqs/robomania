@@ -14,7 +14,7 @@ topics: [dc-motor, h-bridge, pwm, dual-core]
 ---
 
 The example above runs the same arithmetic as the firmware, so each bar shows the speed the robot would give that
-motor. Drag a stick a little: while the knob's centre is inside the dashed circle, nothing moves.
+motor. Drag a stick a little: while the knob's center is inside the dashed circle, nothing moves.
 
 ## What it does
 

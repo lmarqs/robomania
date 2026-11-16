@@ -106,7 +106,7 @@ The drivers in `lib/`:
 | `pulse_timer.h` | The width of the last pulse from the edges an interrupt reports |
 | `positional_servo.*` | A positional servo, such as 0° to 180° |
 | `rc_channel.*` | An RC receiver channel's pulse width as a stick position or a knob level |
-| `pulse_range.*` | A position from -1 to 1 as a pulse between low, centre and high, and back |
+| `pulse_range.*` | A position from -1 to 1 as a pulse between low, center and high, and back |
 | `pulse_out.*` | A servo-style pulse on a PWM pin, set by a position from -1 to 1, that the ESC and servo drivers share |
 | `mpu6050_imu.*` | An MPU6050 accelerometer and gyroscope on I2C |
 | `complementary_filter.*` | One steady angle out of an accelerometer's and a gyroscope's readings |

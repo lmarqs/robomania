@@ -8,7 +8,7 @@ state: draft
 order: 3
 ---
 
-A hobby servo has a motor, a gearbox, a sensor that knows the output's angle, and a small controller that keeps
+A hobby servo has a motor, a gearbox, a sensor that knows the output's angle, and a small circuit that keeps
 turning until the angle matches the one asked for. It is asked with a pulse, sent 50 times a second: the pulse's
 width says the angle.
 

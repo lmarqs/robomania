@@ -3,7 +3,7 @@
 
 static RcChannel channel() { return RcChannel(1000, 1500, 2000, 20); }
 
-void test_centre_pulse_is_position_zero(void) { TEST_ASSERT_FLOAT_WITHIN(1e-6f, 0.0f, channel().position(1500)); }
+void test_center_pulse_is_position_zero(void) { TEST_ASSERT_FLOAT_WITHIN(1e-6f, 0.0f, channel().position(1500)); }
 
 void test_pulse_inside_dead_zone_is_position_zero(void) {
   TEST_ASSERT_FLOAT_WITHIN(1e-6f, 0.0f, channel().position(1519));
@@ -58,7 +58,7 @@ void test_widths_outside_500_to_2500_us_are_noise(void) {
 
 int main(int, char**) {
   UNITY_BEGIN();
-  RUN_TEST(test_centre_pulse_is_position_zero);
+  RUN_TEST(test_center_pulse_is_position_zero);
   RUN_TEST(test_pulse_inside_dead_zone_is_position_zero);
   RUN_TEST(test_high_pulse_is_position_one);
   RUN_TEST(test_low_pulse_is_position_minus_one);

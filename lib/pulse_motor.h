@@ -7,7 +7,7 @@
 
 /**
  * A motor its driver runs from a servo-style pulse on a PWM pin, such as a BoardPwmOutPin at 50 Hz: throttle 0 sends
- * the range's centre pulse, which stops it, and -1 and 1 its ends. The range says which motor it is:
+ * the range's center pulse, which stops it, and -1 and 1 its ends. The range says which motor it is:
  *
  * - an ESC that reverses, such as an RC car's: `PulseRange(1000, 1500, 2000)`, neutral in the middle;
  * - a continuous-rotation (360°) servo: `PulseRange::linear(1000, 2000)`;

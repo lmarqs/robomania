@@ -14,7 +14,7 @@ class PulseRange {
  public:
   PulseRange(float lowUs, float centerUs, float highUs);
 
-  /** A range whose centre is half way between its ends, as a servo's travel is. */
+  /** A range whose center is half way between its ends, as a servo's travel is. */
   static PulseRange linear(float lowUs, float highUs);
 
   /**

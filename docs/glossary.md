@@ -39,7 +39,7 @@ _Avoid_: half-bridge
 An electronic speed controller: a device that powers a motor from a servo pulse. A reversing ESC, as in an RC car,
 turns the motor either way; a one-way ESC turns it one way only. An ESC arms, and will run the motor, only after it
 has seen its stop pulse for a few seconds.
-_Avoid_: speed controller, motor controller
+_Avoid_: motor controller
 
 ## Signals
 
@@ -77,6 +77,13 @@ _Avoid_: middle
 The center pulse of a reversing ESC: its stop pulse.
 _Avoid_: idle, zero
 
+**Channel**:
+One signal of an RC receiver, such as throttle or steering, which it sends as servo pulses on a wire of its own.
+_Avoid_: channel alone for an LEDC channel
+
+**LEDC channel**:
+One of the ESP32's hardware PWM outputs. Each one counts on an LEDC timer, which sets its frequency.
+
 **Dead zone**:
 The pulse widths around the center that an RC receiver channel reads as the center, so a stick that rests a little
 off still reads as stopped.
@@ -95,6 +102,23 @@ steering servo, an RC receiver channel.
 How hard and which way a motor turns, from -1, full reverse, through 0, stopped, to 1, full forward. A motor that
 cannot reverse stops for any throttle below 0.
 _Avoid_: speed, power
+
+**Stop**:
+Throttle 0. Each motor stops in its own way: an H-bridge motor coasts, and an ESC gets its stop pulse and decides
+how the motor stops.
+
+**Coast**:
+Let a motor spin down freely, with no power on its terminals.
+_Avoid_: free-run
+
+**Brake**:
+Stop a motor fast by connecting its terminals together. Whether an H-bridge brakes or coasts with both inputs low
+depends on its chip.
+
+**Controller**:
+The device a person drives a robot with: a Bluetooth gamepad or an RC transmitter. A PID controller and a flight
+controller are terms of their own.
+_Avoid_: controller, for an ESC, a microcontroller or a class that decides what a robot does
 
 **Angle**:
 Where a positional servo's horn points, in degrees from 0 to its range, such as 180.

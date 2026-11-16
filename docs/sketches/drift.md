@@ -54,7 +54,7 @@ The MPU6050 lies flat, so its Z axis points up and its Z rate is the car's yaw r
 
 ### Gamepad
 
-- **Left stick, sideways**: steering. A deflection under 40 of 512 counts as centred.
+- **Left stick, sideways**: steering. A deflection under 40 of 512 counts as centered.
 - **Right stick, up and down**: up drives forward; down brakes, then reverses, as the ESC does it. The throttle
   follows how far the stick is pushed, through the `DRIFT_THROTTLE_EXPO` curve, with the same dead zone as the
   steering.
@@ -65,17 +65,17 @@ The first gamepad to connect drives the car; the car forgets paired gamepads at 
 
 ### RC receiver
 
-- **Throttle channel**: forward from the centre pulse up to `DRIFT_RECEIVER_HIGH_US`, brake and reverse down to
+- **Throttle channel**: forward from the center pulse up to `DRIFT_RECEIVER_HIGH_US`, brake and reverse down to
   `DRIFT_RECEIVER_LOW_US`, through the same `DRIFT_THROTTLE_EXPO` curve and `DRIFT_THROTTLE_MAX` as the gamepad.
 - **Steering channel**: right toward `DRIFT_RECEIVER_HIGH_US`, left toward `DRIFT_RECEIVER_LOW_US`.
 
 The gain stays at `DRIFT_GAIN`.
 
-A pulse within `DRIFT_RECEIVER_DEAD_ZONE_US` of the centre counts as centred, and a width outside 500 to 2500 µs counts
+A pulse within `DRIFT_RECEIVER_DEAD_ZONE_US` of the center counts as centered, and a width outside 500 to 2500 µs counts
 as no pulse. A channel that drives the car the wrong way is flipped with the transmitter's channel reverse.
 
 When the throttle or the steering channel sends no pulse for `DRIFT_RECEIVER_TIMEOUT_MS`, the car sends neutral
-throttle and centre steering until both pulse again. A receiver set to keep sending its own failsafe pulses on signal
+throttle and center steering until both pulse again. A receiver set to keep sending its own failsafe pulses on signal
 loss drives the car with those instead.
 
 ## Status LED
@@ -124,8 +124,8 @@ Each setting is a `#define` in `sketches/drift/local.h`, which Git ignores; the 
 | `DRIFT_STEERING_LEFT_US`, `_CENTER_US`, `_RIGHT_US` | 1000, 1500, 2000 | The servo pulses at full left, straight ahead and full right. Set them to where the car's steering stops, so the servo never stalls against them. |
 | `DRIFT_CONTROLLER` | `DRIFT_CONTROLLER_GAMEPAD` | What drives the car, as [Choosing the controller](#choosing-the-controller) says. |
 | `DRIFT_RECEIVER_THROTTLE_PIN`, `_STEERING_PIN` | 17, 5 | The GPIO of each receiver channel. |
-| `DRIFT_RECEIVER_LOW_US`, `_CENTER_US`, `_HIGH_US` | 1000, 1500, 2000 | The receiver's pulses at one end, the centre and the other end of every channel. |
-| `DRIFT_RECEIVER_DEAD_ZONE_US` | 20 | How far from the centre pulse a channel still counts as centred. |
+| `DRIFT_RECEIVER_LOW_US`, `_CENTER_US`, `_HIGH_US` | 1000, 1500, 2000 | The receiver's pulses at one end, the center and the other end of every channel. |
+| `DRIFT_RECEIVER_DEAD_ZONE_US` | 20 | How far from the center pulse a channel still counts as centered. |
 | `DRIFT_RECEIVER_TIMEOUT_MS` | 100 | How long the throttle or steering channel may go without a pulse before the car stops. |
 | `DRIFT_STATUS_LED` | 1 with a gamepad, 0 with a receiver | 1 shows the status on the LED on GPIO2. Leave it 0 while a receiver channel is wired to GPIO2, where the LED's output would fight the receiver's. |
 | `DRIFT_THROTTLE_MAX` | 0.5 | The largest throttle the controller reaches, as a fraction of the ESC's range each way. |
