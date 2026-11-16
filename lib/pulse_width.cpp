@@ -14,6 +14,8 @@ PulseRange::PulseRange(float lowUs, float centerUs, float highUs) {
   this->highUs = highUs;
 }
 
+PulseRange PulseRange::linear(float lowUs, float highUs) { return PulseRange(lowUs, (lowUs + highUs) / 2.0f, highUs); }
+
 float PulseRange::pulseUs(float position) const {
   if (position != position) {
     return centerUs;
