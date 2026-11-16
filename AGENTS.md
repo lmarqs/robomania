@@ -3,9 +3,9 @@
 Firmware for an ESP32 RC car: drivers in `lib/` and sketches in `sketches/`, and Robomania, its website,
 in `site/`. The [README](README.md) says how to build and flash.
 
-Stack: C++ on the Arduino cores `esp32-bluepad32:esp32` 4, `esp8266:esp8266` 3 and `digistump:avr` 1, pinned in
-each sketch's `sketch.yaml`; arduino-cli 1,
-Python 3.12, uv, clang-format, ruff and the-cook, pinned in `mise.toml`; pyserial 3 in `pyproject.toml`. The
+Stack: C++ on the Arduino cores `esp32-bluepad32:esp32` 4, `esp8266:esp8266` 3, `arduino:avr` 1 and
+`digistump:avr` 1, pinned in each sketch's `sketch.yaml`; arduino-cli 1,
+Python 3.12, uv, clang-format, ruff, the-cook and yq, pinned in `mise.toml`; pyserial 3 in `pyproject.toml`. The
 website: Astro 7 in `site/package.json`, Node 24 in `mise.toml`, pnpm 12 in `mise.toml` and the root
 `package.json`.
 
