@@ -7,7 +7,7 @@
 
 /**
  * An electronic speed controller for a brushless motor that spins one way, driven by pulse width on a PWM pin, such as
- * an EspPwmOutPin at 200 Hz. Throttle 0 is the minimum pulse, which stops the motor.
+ * a BoardPwmOutPin at 200 Hz. Throttle 0 is the minimum pulse, which stops the motor.
  */
 class Esc {
  private:
@@ -31,7 +31,7 @@ class Esc {
 
 /**
  * An electronic speed controller that drives forward and in reverse, such as an RC car's, driven by pulse width on a
- * PWM pin, such as an EspPwmOutPin at 50 Hz. Throttle 0 is the neutral pulse, which stops the motor; a longer one
+ * PWM pin, such as a BoardPwmOutPin at 50 Hz. Throttle 0 is the neutral pulse, which stops the motor; a longer one
  * drives forward and a shorter one brakes or reverses, as the ESC decides.
  */
 class ReversibleEsc {

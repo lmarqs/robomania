@@ -30,7 +30,7 @@ class PwmOutPin {
   virtual bool begin() = 0;
   virtual void write(uint16_t duty) = 0;
   /** The frequency the hardware runs at, in hertz, which can differ slightly from the one asked for. */
-  virtual uint32_t frequency() = 0;
+  virtual uint32_t frequencyHz() = 0;
 };
 
 /**

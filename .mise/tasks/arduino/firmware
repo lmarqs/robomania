@@ -26,7 +26,7 @@ from pathlib import Path
 SKETCHES = Path("sketches")
 BUILD = Path(".build/firmware")
 OUTPUT = Path("site/public/firmware")
-PLATFORM_PREFIXES = ("esp32-bluepad32:esp32", "esp8266:esp8266")
+PLATFORM_PREFIXES = ("esp32-bluepad32:esp32", "esp32:esp32", "esp8266:esp8266")
 CHIP_FAMILIES = {"esp32": "ESP32", "esp32c3": "ESP32-C3", "esp8266": "ESP8266"}
 UPLOAD_RECIPES = ("tools.esptool_py.upload.pattern_args", "tools.esptool.upload.pattern")
 PROFILE = re.compile(r"^  (\w[\w-]*):\s*$")

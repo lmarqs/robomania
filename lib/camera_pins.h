@@ -20,7 +20,7 @@
 // #define CAMERA_MODEL_DFRobot_Romeo_ESP32S3 // Has PSRAM
 #pragma once
 
-#ifdef ESP32
+#if defined(ESP32) && __has_include(<esp_camera.h>)
 #if defined(CAMERA_MODEL_WROVER_KIT)
 #define PWDN_GPIO_NUM -1
 #define RESET_GPIO_NUM -1

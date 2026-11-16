@@ -16,5 +16,5 @@ class FakePwmOutPin : public PwmOutPin {
     writes++;
     duty = value;
   }
-  uint32_t frequency() override { return hz; }
+  uint32_t frequencyHz() override { return hz; }
 };

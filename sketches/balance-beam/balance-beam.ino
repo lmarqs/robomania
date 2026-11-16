@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <esc.h>
 #include <imu.h>
-#include <pwm_out_pin.h>
+#include <board_pwm_out_pin.h>
 #include <serial_io.h>
 
 #include "./balancer.h"
@@ -14,7 +14,6 @@
 // 14 bits is the finest LEDC resolution the ESP32-C3 has, and at 200 Hz one step of it is 0.3 µs. The ESCs take
 // a fresh pulse on every step of the 200 Hz control loop.
 const uint32_t ESC_HZ = 200;
-const uint8_t ESC_RESOLUTION = 14;
 const uint32_t ESC_ARM_MS = 3000;
 
 // Above the HTTP server's priority of 5, so control preempts it on the single-core C3, and below lwIP's 18 and
@@ -22,8 +21,8 @@ const uint32_t ESC_ARM_MS = 3000;
 const UBaseType_t CONTROL_PRIORITY = 10;
 const uint32_t CONTROL_STACK_BYTES = 8192;
 
-static EspPwmOutPin escPin1(ESC_1_PIN, ESC_HZ, ESC_RESOLUTION);
-static EspPwmOutPin escPin2(ESC_2_PIN, ESC_HZ, ESC_RESOLUTION);
+static BoardPwmOutPin escPin1(ESC_1_PIN, ESC_HZ);
+static BoardPwmOutPin escPin2(ESC_2_PIN, ESC_HZ);
 static Esc esc1(&escPin1);
 static Esc esc2(&escPin2);
 static Mpu6050Imu imu(&Wire);

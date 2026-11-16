@@ -3,7 +3,9 @@
 #ifdef ESP32
 #include <Arduino.h>
 #include <FS.h>
-#define CONFIG_HTTPD_WS_SUPPORT
+#ifndef CONFIG_HTTPD_WS_SUPPORT
+#define CONFIG_HTTPD_WS_SUPPORT 1
+#endif
 #include <esp_http_server.h>
 
 using EspWebServerFrameHandler = std::function<void(httpd_ws_frame_t* frame)>;

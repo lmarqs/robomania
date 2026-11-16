@@ -1,6 +1,7 @@
 #pragma once
 
-#ifdef ESP32
+// Only ESP32 chips with a camera interface, such as the ESP32-CAM's, ship the camera driver.
+#if defined(ESP32) && __has_include(<esp_camera.h>)
 #include <Arduino.h>
 #include <esp_camera.h>
 

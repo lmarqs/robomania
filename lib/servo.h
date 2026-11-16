@@ -7,7 +7,7 @@
 
 /**
  * A servo that holds the angle each pulse width encodes, from 0 to `range` degrees, such as 180, driven by a PWM pin
- * such as an EspPwmOutPin at 50 Hz. The defaults, 544 µs at 0° and 2400 µs at `range`, are the Arduino Servo
+ * such as a BoardPwmOutPin at 50 Hz. The defaults, 544 µs at 0° and 2400 µs at `range`, are the Arduino Servo
  * library's.
  */
 class PositionalServo {

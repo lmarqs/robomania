@@ -4,7 +4,7 @@
 #include <digital_pin.h>
 #include <h_bridge.h>
 #include <pin.h>
-#include <pwm_out_pin.h>
+#include <board_pwm_out_pin.h>
 
 #include "./car.h"
 #include "./drive_command.h"
